@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title> "Economic" Quiz </title>
+    <title>"Economic" Quiz</title>
     
     <style>
         /* General Reset and Base Styles */
@@ -105,6 +105,10 @@
             position: relative;
             min-height: 100vh;
             display: none;
+        }
+
+        #quizPage.end-bg {
+            background: #000; /* Black background at the end */
         }
 
         .container {
@@ -255,6 +259,20 @@
         @keyframes slideDown {
             from { opacity: 0; transform: translateY(-10px); }
             to { opacity: 1; transform: translateY(0); }
+        }
+
+        .trick-title {
+            color: red;
+            font-weight: bold;
+        }
+
+        .trick-content {
+            color: blue;
+            font-weight: bold;
+        }
+
+        .trick {
+            margin-top: 10px;
         }
 
         .progress {
@@ -518,6 +536,16 @@
             overflow-y: auto;
         }
 
+        #autoScrollContainer {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            z-index: 1000;
+            background: rgba(255, 255, 255, 0.8);
+            padding: 10px;
+            border-radius: 8px;
+        }
+
         @media (max-width: 768px) {
             .container, .dashboard-container {
                 padding: 20px;
@@ -563,6 +591,17 @@
                 <option value="en">English</option>
                 <option value="both">Both</option>
             </select>
+            <!-- New Auto Scroll Controls -->
+            <div id="autoScrollContainer">
+                <label for="autoScrollSpeed">Auto Scroll Speed:</label>
+                <select id="autoScrollSpeed" onchange="startAutoScroll()">
+                    <option value="none">None</option>
+                    <option value="very-slow">Very Slow (10 sec/question)</option>
+                    <option value="slow">Slow (7 sec/question)</option>
+                    <option value="normal">Normal (5 sec/question)</option>
+                    <option value="fast">Fast (3 sec/question)</option>
+                </select>
+            </div>
             <div id="restartModal">
                 <h2>Select Questions to Restart</h2>
                 <div id="questionCheckboxes"></div>
@@ -585,16 +624,920 @@
         const questions = [
     // Very Hard Questions (1-15)
     
-    {
-        "q": "मोहम्मद साहब का जन्म कब हुआ था?",
-        "q_en": "When was Prophet Muhammad born?",
-        "options": ["560 ई.", "570 ई.", "580 ई.", "590 ई."],
-        "options_en": ["560 CE", "570 CE", "580 CE", "590 CE"],
+     {
+        "q": "संविधान किसे कहते हैं?",
+        "q_en": "What is a Constitution?",
+        "options": ["समाज की संस्कृति", "देश का सर्वोच्च कानून", "सरकार का कार्यक्रम", "धार्मिक नियम"],
+        "options_en": ["Culture of society", "Supreme law of the country", "Government's program", "Religious rules"],
         "answer": 1,
-        "explanation": "मोहम्मद साहब का जन्म 570 ई. में हुआ था।",
-        "explanation_en": "Prophet Muhammad was born in 570 CE."
+        "explanation": "संविधान एक लिखित या अलिखित दस्तावेज है जो शासन और प्रशासन के लिए मूलभूत नियम और सिद्धांत प्रदान करता है। यह देश का सर्वोच्च कानून होता है। Trick: संसार को चलाने का नियम → संविधान।",
+        "explanation_en": "A Constitution is a written or unwritten document that provides the fundamental rules and principles for governance and administration, serving as the country's supreme law. Trick: Rule to run the world → Constitution."
+    },
+    {
+        "q": "भारत का संविधान किस श्रेणी में आता है?",
+        "q_en": "What category does the Indian Constitution fall under?",
+        "options": ["अलिखित और कठोर", "लिखित और कठोर", "लिखित और लचीला", "लिखित और आंशिक कठोर-लचीला"],
+        "options_en": ["Unwritten and rigid", "Written and rigid", "Written and flexible", "Written and partly rigid-flexible"],
+        "answer": 3,
+        "explanation": "भारत का संविधान विश्व का सबसे बड़ा लिखित संविधान है, जो न तो पूरी तरह कठोर है और न ही पूरी तरह लचीला, बल्कि आंशिक रूप से दोनों गुणों का मिश्रण है। Trick: भारत = Balance Constitution।",
+        "explanation_en": "India's Constitution is the world's largest written constitution, neither fully rigid nor fully flexible, but a blend of both. Trick: India = Balance Constitution."
+    },
+    {
+        "q": "संविधान और संविधानवाद में मुख्य अंतर क्या है?",
+        "q_en": "What is the main difference between Constitution and Constitutionalism?",
+        "options": ["दोनों समान हैं", "संविधान एक दस्तावेज है, संविधानवाद एक विचारधारा है", "संविधान एक सिद्धांत है, संविधानवाद केवल लिखित कानून है", "दोनों में कोई अंतर नहीं"],
+        "options_en": ["Both are the same", "Constitution is a document, Constitutionalism is an ideology", "Constitution is a principle, Constitutionalism is only written law", "No difference between them"],
+        "answer": 1,
+        "explanation": "संविधान सरकार के ढांचे और अधिकारों को परिभाषित करने वाला दस्तावेज है, जबकि संविधानवाद सत्ता को सीमित करने और नागरिक अधिकारों की रक्षा करने की विचारधारा है। Trick: संविधान = Document, संविधानवाद = Discipline।",
+        "explanation_en": "The Constitution is a document defining the structure and powers of the government, whereas Constitutionalism is the ideology of limiting power and protecting citizens' rights. Trick: Constitution = Document, Constitutionalism = Discipline."
+    },
+    {
+        "q": "संविधान की आवश्यकता क्यों होती है?",
+        "q_en": "Why is a Constitution necessary?",
+        "options": ["केवल चुनाव कराने के लिए", "केवल सरकार बनाने के लिए", "शासन-प्रशासन चलाने और नागरिक अधिकारों की रक्षा के लिए", "धार्मिक नियमों को लागू करने के लिए"],
+        "options_en": ["Only for conducting elections", "Only for forming the government", "For running governance and protecting citizens' rights", "For enforcing religious rules"],
+        "answer": 2,
+        "explanation": "संविधान सरकार की संरचना को परिभाषित करता है, नागरिकों के अधिकारों की रक्षा करता है, और सत्ता पर नियंत्रण रखता है। Trick: संविधान = शासन + अधिकार + सीमा।",
+        "explanation_en": "The Constitution defines the structure of the government, protects citizens' rights, and imposes limits on power. Trick: Constitution = Governance + Rights + Limits."
+    },
+    {
+        "q": "किस देश का संविधान ‘अलिखित’ है?",
+        "q_en": "Which country has an unwritten Constitution?",
+        "options": ["भारत", "अमेरिका", "ब्रिटेन", "फ्रांस"],
+        "options_en": ["India", "USA", "UK", "France"],
+        "answer": 2,
+        "explanation": "ब्रिटेन का संविधान परंपराओं, रीति-रिवाजों, न्यायिक निर्णयों और प्रथाओं पर आधारित है, जो एकल दस्तावेज में नहीं लिखा गया। Trick: UK = UnWritten।",
+        "explanation_en": "The UK's Constitution is based on traditions, customs, judicial decisions, and practices, not written in a single document. Trick: UK = UnWritten."
+    },
+    {
+        "q": "भारत ने लिखित संविधान की धारणा कहाँ से ली?",
+        "q_en": "From where did India adopt the concept of a written Constitution?",
+        "options": ["फ्रांस", "अमेरिका", "ब्रिटेन", "रूस"],
+        "options_en": ["France", "USA", "UK", "Russia"],
+        "answer": 1,
+        "explanation": "भारत ने अपने संविधान के लिए कई देशों से विशेषताएँ उधार लीं, जिसमें लिखित संविधान की अवधारणा अमेरिका से ली गई। Trick: USA = Ulikhit Samvidhan Aaya।",
+        "explanation_en": "India borrowed features from several countries, including the concept of a written Constitution from the USA. Trick: USA = Written Constitution Came."
+    },
+    {
+        "q": "कठोर संविधान का उदाहरण कौन सा है?",
+        "q_en": "Which is an example of a rigid Constitution?",
+        "options": ["भारत", "अमेरिका", "ब्रिटेन", "कनाडा"],
+        "options_en": ["India", "USA", "UK", "Canada"],
+        "answer": 1,
+        "explanation": "अमेरिका का संविधान संशोधन की जटिल प्रक्रिया के कारण कठोर माना जाता है। Trick: US = Ultra Strict।",
+        "explanation_en": "The US Constitution is considered rigid due to its complex amendment process. Trick: US = Ultra Strict."
+    },
+    {
+        "q": "लचीले संविधान का उदाहरण कौन सा है?",
+        "q_en": "Which is an example of a flexible Constitution?",
+        "options": ["ब्रिटेन", "अमेरिका", "भारत", "स्विट्ज़रलैंड"],
+        "options_en": ["UK", "USA", "India", "Switzerland"],
+        "answer": 0,
+        "explanation": "ब्रिटेन का संविधान सामान्य कानून की तरह आसानी से संशोधित हो सकता है। Trick: UK = Ultra Kachha।",
+        "explanation_en": "The UK's Constitution can be amended like ordinary law, making it flexible. Trick: UK = Ultra Flexible."
+    },
+    {
+        "q": "भारत का संविधान किस प्रकार का है?",
+        "q_en": "What type is the Indian Constitution?",
+        "options": ["संघीय और लचीला", "संघीय लेकिन एकात्मक झुकाव वाला", "केवल संघीय", "केवल एकात्मक"],
+        "options_en": ["Federal and flexible", "Federal with unitary bias", "Only federal", "Only unitary"],
+        "answer": 1,
+        "explanation": "भारतीय संविधान में संघीय ढांचा है, लेकिन आपातकाल में केंद्र की शक्ति बढ़ जाती है, जो इसे एकात्मक झुकाव देता है। Trick: भारत = Federal with Flavour of Unitary।",
+        "explanation_en": "The Indian Constitution has a federal structure but leans toward unitary during emergencies due to increased central powers. Trick: India = Federal with Flavour of Unitary."
+    },
+    {
+        "q": "संविधानवाद का मुख्य उद्देश्य क्या है?",
+        "q_en": "What is the main objective of Constitutionalism?",
+        "options": ["जनता को सत्ता से दूर रखना", "सरकार की शक्ति सीमित करना और नागरिक अधिकारों की रक्षा करना", "निरंकुश शासन को बढ़ावा देना", "सेना को अधिक शक्तिशाली बनाना"],
+        "options_en": ["Keeping people away from power", "Limiting government power and protecting citizens' rights", "Promoting absolute rule", "Strengthening the military"],
+        "answer": 1,
+        "explanation": "संविधानवाद का लक्ष्य है सत्ता को नियंत्रित करना और कानून के शासन के तहत नागरिकों के अधिकारों की रक्षा करना। Trick: वाद = रोकथाम।",
+        "explanation_en": "Constitutionalism aims to control power and protect citizens' rights under the rule of law. Trick: Constitutionalism = Control."
+    },
+    {
+        "q": "राज्य की परिभाषा में कौन-सा तत्व आवश्यक है?",
+        "q_en": "Which element is essential in the definition of a state?",
+        "options": ["क्षेत्रफल", "जनसंख्या", "सरकार", "संप्रभुता", "उपरोक्त सभी"],
+        "options_en": ["Territory", "Population", "Government", "Sovereignty", "All of the above"],
+        "answer": 4,
+        "explanation": "राज्य के गठन के लिए चार आवश्यक तत्व हैं: क्षेत्रफल, जनसंख्या, सरकार, और संप्रभुता। Trick: राज्य = भू-जन-सरकार-स्वतंत्रता।",
+        "explanation_en": "A state requires four essential elements: territory, population, government, and sovereignty. Trick: State = Land-People-Government-Freedom."
+    },
+    {
+        "q": "‘राज्य ईश्वर निर्मित है’ – यह किस सिद्धांत से संबंधित है?",
+        "q_en": "‘The state is created by God’ – This is related to which theory?",
+        "options": ["शक्ति सिद्धांत", "दैवी सिद्धांत", "सामाजिक अनुबंध सिद्धांत", "आधुनिक सिद्धांत"],
+        "options_en": ["Force Theory", "Divine Theory", "Social Contract Theory", "Modern Theory"],
+        "answer": 1,
+        "explanation": "दैवी सिद्धांत कहता है कि राज्य ईश्वर द्वारा बनाया गया है। Trick: दैवी = दैव (God)।",
+        "explanation_en": "The Divine Theory states that the state is created by God. Trick: Divine = God."
+    },
+    {
+        "q": "‘सशक्त लोग कमजोर पर शासन करते हैं’ – यह किस सिद्धांत का आधार है?",
+        "q_en": "‘The strong rule over the weak’ – This is the basis of which theory?",
+        "options": ["दैवी सिद्धांत", "शक्ति सिद्धांत", "अनुबंध सिद्धांत", "सार्वभौमिक सिद्धांत"],
+        "options_en": ["Divine Theory", "Force Theory", "Contract Theory", "Universal Theory"],
+        "answer": 1,
+        "explanation": "शक्ति सिद्धांत के अनुसार, राज्य का निर्माण शक्तिशाली लोगों द्वारा कमजोरों पर शासन करने से हुआ। Trick: Power = Pressure।",
+        "explanation_en": "The Force Theory suggests that the state was formed by the strong ruling over the weak. Trick: Power = Pressure."
+    },
+    {
+        "q": "‘राज्य जनता के बीच अनुबंध से बना’ – यह किस सिद्धांत से है?",
+        "q_en": "‘The state is formed by a contract among people’ – This is related to which theory?",
+        "options": ["दैवी सिद्धांत", "शक्ति सिद्धांत", "सामाजिक अनुबंध सिद्धांत", "आधुनिक सिद्धांत"],
+        "options_en": ["Divine Theory", "Force Theory", "Social Contract Theory", "Modern Theory"],
+        "answer": 2,
+        "explanation": "सामाजिक अनुबंध सिद्धांत, जिसे होब्स, लॉक, और रूसो ने प्रतिपादित किया, कहता है कि राज्य लोगों के आपसी समझौते से बना। Trick: Contract = समझौता = जनता का State।",
+        "explanation_en": "The Social Contract Theory, proposed by Hobbes, Locke, and Rousseau, states that the state was formed by a mutual agreement among people. trick: Contract = Agreement = People's State."
+    },
+    {
+        "q": "भारत में संप्रभुता किसके पास है?",
+        "q_en": "Who holds sovereignty in India?",
+        "options": ["राष्ट्रपति", "प्रधानमंत्री", "संसद", "जनता"],
+        "options_en": ["President", "Prime Minister", "Parliament", "People"],
+        "answer": 3,
+        "explanation": "भारतीय संविधान की प्रस्तावना कहती है – ‘हम भारत के लोग...’, जो दर्शाता है कि संप्रभुता जनता के पास है। Trick: We the People = जनता सर्वोच्च।",
+        "explanation_en": "The Preamble of the Indian Constitution states ‘We the People...’, indicating that sovereignty lies with the people. Trick: We the People = People Supreme."
+    },
+    {
+        "q": "राष्ट्र और राज्य में क्या अंतर है?",
+        "q_en": "What is the difference between a nation and a state?",
+        "options": ["राष्ट्र राजनीतिक इकाई, राज्य सांस्कृतिक इकाई", "राष्ट्र सांस्कृतिक इकाई, राज्य राजनीतिक इकाई", "दोनों समान हैं", "कोई अंतर नहीं"],
+        "options_en": ["Nation is a political unit, state is a cultural unit", "Nation is a cultural unit, state is a political unit", "Both are the same", "No difference"],
+        "answer": 1,
+        "explanation": "राष्ट्र सांस्कृतिक और भावनात्मक एकता को दर्शाता है, जबकि राज्य एक राजनीतिक इकाई है जिसमें संप्रभुता और सरकार होती है। Trick: राज्य = Raj (Politics), राष्ट्र = Ras (Culture)।",
+        "explanation_en": "A nation reflects cultural and emotional unity, while a state is a political entity with sovereignty and government. Trick: State = Raj (Politics), Nation = Ras (Culture)."
+    },
+    {
+        "q": "‘कानून का शासन’ (Rule of Law) का अर्थ क्या है?",
+        "q_en": "What does ‘Rule of Law’ mean?",
+        "options": ["राजा सर्वोच्च", "जनता सर्वोच्च", "कानून सर्वोच्च", "सेना सर्वोच्च"],
+        "options_en": ["King is supreme", "People are supreme", "Law is supreme", "Military is supreme"],
+        "answer": 2,
+        "explanation": "कानून का शासन का मतलब है कि कोई भी व्यक्ति या सरकार कानून से ऊपर नहीं है। Trick: Law > King।",
+        "explanation_en": "Rule of Law means no one, including the government, is above the law. Trick: Law > King."
+    },
+    {
+        "q": "स्वतंत्र न्यायपालिका की भूमिका क्या है?",
+        "q_en": "What is the role of an independent judiciary?",
+        "options": ["केवल सरकार का समर्थन करना", "जनता को निष्पक्ष न्याय देना और सरकार पर नियंत्रण रखना", "संसद को मजबूत बनाना", "राष्ट्रपति की शक्ति बढ़ाना"],
+        "options_en": ["Only supporting the government", "Providing impartial justice to people and controlling the government", "Strengthening Parliament", "Increasing the President's power"],
+        "answer": 1,
+        "explanation": "न्यायपालिका संविधान और नागरिक अधिकारों की रक्षा करती है और सरकार की मनमानी पर अंकुश लगाती है। Trick: Nyay = Niyantran।",
+        "explanation_en": "The judiciary protects the Constitution and citizens' rights while checking arbitrary government actions. Trick: Justice = Control."
+    },
+    {
+        "q": "संविधान में नागरिकों को क्या मिलता है?",
+        "q_en": "What does the Constitution provide to citizens?",
+        "options": ["केवल कर्तव्य", "केवल अधिकार", "मौलिक अधिकार व कर्तव्य दोनों", "केवल संपत्ति"],
+        "options_en": ["Only duties", "Only rights", "Both fundamental rights and duties", "Only property"],
+        "answer": 2,
+        "explanation": "भारतीय संविधान नागरिकों को मौलिक अधिकार (भाग III) और मौलिक कर्तव्य (भाग IV-A) दोनों प्रदान करता है। Trick: Citizen = Rights + Duties।",
+        "explanation_en": "The Indian Constitution grants citizens both fundamental rights (Part III) and fundamental duties (Part IV-A). Trick: Citizen = Rights + Duties."
+    },
+    {
+        "q": "‘हम भारत के लोग’ शब्द किससे लिया गया है?",
+        "q_en": "The phrase ‘We the People of India’ is taken from where?",
+        "options": ["प्रस्तावना", "मूल अधिकार", "राज्य नीति निदेशक तत्व", "मौलिक कर्तव्य"],
+        "options_en": ["Preamble", "Fundamental Rights", "Directive Principles of State Policy", "Fundamental Duties"],
+        "answer": 0,
+        "explanation": "प्रस्तावना भारतीय संविधान की आत्मा है और ‘हम भारत के लोग’ से शुरू होती है। Trick: Start = हम भारत के लोग।",
+        "explanation_en": "The Preamble is the soul of the Indian Constitution and begins with ‘We the People of India’. Trick: Start = We the People."
     },
 
+    {
+        "q": "भारत का संविधान किस वर्ष लागू हुआ?",
+        "q_en": "In which year was the Indian Constitution enforced?",
+        "options": ["26 जनवरी 1947", "26 जनवरी 1950", "15 अगस्त 1947", "26 नवंबर 1949"],
+        "options_en": ["26 January 1947", "26 January 1950", "15 August 1947", "26 November 1949"],
+        "answer": 1,
+        "explanation": "संविधान सभा ने 26 नवंबर 1949 को संविधान को अपनाया, लेकिन यह 26 जनवरी 1950 को लागू हुआ, जिसे गणतंत्र दिवस के रूप में मनाया जाता है। Trick: गणतंत्र दिवस = संविधान लागू दिवस।",
+        "explanation_en": "The Constituent Assembly adopted the Constitution on 26 November 1949, but it came into effect on 26 January 1950, celebrated as Republic Day. Trick: Republic Day = Constitution Enforcement Day."
+    },
+    {
+        "q": "संविधान का मसौदा किसके नेतृत्व में तैयार हुआ?",
+        "q_en": "Under whose leadership was the draft of the Constitution prepared?",
+        "options": ["जवाहरलाल नेहरू", "डॉ. राजेंद्र प्रसाद", "डॉ. भीमराव अंबेडकर", "सरदार पटेल"],
+        "options_en": ["Jawaharlal Nehru", "Dr. Rajendra Prasad", "Dr. Bhimrao Ambedkar", "Sardar Patel"],
+        "answer": 2,
+        "explanation": "डॉ. भीमराव अंबेडकर संविधान सभा की प्रारूप समिति के अध्यक्ष थे और संविधान निर्माण में उनकी प्रमुख भूमिका थी। Trick: Baba Saheb = Bharat Samvidhan।",
+        "explanation_en": "Dr. Bhimrao Ambedkar was the chairman of the Drafting Committee of the Constituent Assembly and played a key role in drafting the Constitution. Trick: Baba Saheb = Bharat Constitution."
+    },
+    {
+        "q": "भारतीय संविधान को 'संविधान की आत्मा' किसे कहा जाता है?",
+        "q_en": "What is referred to as the 'soul of the Indian Constitution'?",
+        "options": ["मौलिक अधिकार", "मौलिक कर्तव्य", "प्रस्तावना", "DPSP"],
+        "options_en": ["Fundamental Rights", "Fundamental Duties", "Preamble", "DPSP"],
+        "answer": 2,
+        "explanation": "प्रस्तावना भारतीय संविधान की मूल भावना, उद्देश्यों और दर्शन को व्यक्त करती है, इसलिए इसे संविधान की आत्मा कहा जाता है। Trick: Preamble = Pran + Atma।",
+        "explanation_en": "The Preamble expresses the core spirit, objectives, and philosophy of the Indian Constitution, hence called its soul. Trick: Preamble = Spirit + Soul."
+    },
+    {
+        "q": "संविधान का मुख्य कार्य क्या है?",
+        "q_en": "What is the primary function of the Constitution?",
+        "options": ["शिक्षा देना", "नागरिकों की सुरक्षा करना", "सरकार की संरचना और अधिकार तय करना", "युद्ध करना"],
+        "options_en": ["Providing education", "Protecting citizens", "Determining the structure and powers of the government", "Waging war"],
+        "answer": 2,
+        "explanation": "संविधान शासन व्यवस्था की रूपरेखा तैयार करता है, सरकार के अधिकार और कर्तव्यों को परिभाषित करता है, और नागरिकों के अधिकारों की रक्षा करता है। Trick: संविधान = सरकार का नक्शा।",
+        "explanation_en": "The Constitution outlines the framework of governance, defines the powers and duties of the government, and protects citizens' rights. Trick: Constitution = Government's Blueprint."
+    },
+    {
+        "q": "संविधान किसे प्रतिबंधित करता है?",
+        "q_en": "What does the Constitution restrict?",
+        "options": ["जनता को", "सरकार की शक्तियों को", "केवल न्यायपालिका को", "केवल विधायिका को"],
+        "options_en": ["The people", "The powers of the government", "Only the judiciary", "Only the legislature"],
+        "answer": 1,
+        "explanation": "संविधान सरकार को मनमाने ढंग से कार्य करने से रोकता है और उसे कानून के दायरे में कार्य करने के लिए बाध्य करता है। Trick: संविधान = शक्ति पर सीमा।",
+        "explanation_en": "The Constitution prevents the government from acting arbitrarily and binds it to operate within the framework of the law. Trick: Constitution = Limit on Power."
+    },
+    {
+        "q": "‘संविधान सर्वोच्च है’ – यह सिद्धांत किससे संबंधित है?",
+        "q_en": "‘The Constitution is supreme’ – This principle is related to which concept?",
+        "options": ["संविधानवाद", "संघीय संविधान", "लचीला संविधान", "कठोर संविधान"],
+        "options_en": ["Constitutionalism", "Federal Constitution", "Flexible Constitution", "Rigid Constitution"],
+        "answer": 0,
+        "explanation": "संविधानवाद यह सुनिश्चित करता है कि संविधान सर्वोच्च है और सरकार की शक्तियों को इसके द्वारा नियंत्रित किया जाता है। Trick: वाद = सीमा, संविधान = सर्वोच्च।",
+        "explanation_en": "Constitutionalism ensures that the Constitution is supreme and controls the powers of the government. Trick: Constitutionalism = Limit, Constitution = Supreme."
+    },
+    {
+        "q": "‘जनता सर्वोच्च है’ – यह किस सिद्धांत का प्रतीक है?",
+        "q_en": "‘The people are supreme’ – This is a symbol of which principle?",
+        "options": ["राजतंत्र", "लोकप्रिय संप्रभुता", "सैन्य शासन", "निरंकुश शासन"],
+        "options_en": ["Monarchy", "Popular Sovereignty", "Military Rule", "Absolute Rule"],
+        "answer": 1,
+        "explanation": "लोकतंत्र में सत्ता का स्रोत जनता होती है, जो लोकप्रिय संप्रभुता का आधार है। Trick: लोकप्रिय = लोग सर्वोच्च।",
+        "explanation_en": "In a democracy, the people are the source of power, which is the basis of popular sovereignty. Trick: Popular = People Supreme."
+    },
+    {
+        "q": "‘कानून के शासन’ का मूल तत्व क्या है?",
+        "q_en": "What is the core element of ‘Rule of Law’?",
+        "options": ["संसद सर्वोच्च है", "राष्ट्रपति सर्वोच्च है", "कोई भी व्यक्ति कानून से ऊपर नहीं है", "प्रधानमंत्री सर्वोच्च है"],
+        "options_en": ["Parliament is supreme", "President is supreme", "No one is above the law", "Prime Minister is supreme"],
+        "answer": 2,
+        "explanation": "कानून का शासन सुनिश्चित करता है कि सभी व्यक्ति और सरकार कानून के समक्ष समान हैं। Trick: Rule of Law = Law > All।",
+        "explanation_en": "The Rule of Law ensures that everyone, including the government, is equal before the law. Trick: Rule of Law = Law > All."
+    },
+    {
+        "q": "संविधान में शक्तियों का विभाजन क्यों किया जाता है?",
+        "q_en": "Why is the separation of powers included in the Constitution?",
+        "options": ["सरकार को कमजोर करने के लिए", "किसी भी अंग को अत्यधिक शक्तिशाली होने से रोकने के लिए", "जनता की भागीदारी रोकने के लिए", "विदेशी हस्तक्षेप रोकने के लिए"],
+        "options_en": ["To weaken the government", "To prevent any branch from becoming too powerful", "To restrict public participation", "To prevent foreign interference"],
+        "answer": 1,
+        "explanation": "शक्तियों का विभाजन विधायिका, कार्यपालिका, और न्यायपालिका के बीच संतुलन बनाए रखने के लिए किया जाता है। Trick: 3 अंग = 3 Balance।",
+        "explanation_en": "The separation of powers between the legislature, executive, and judiciary ensures a balance of power. Trick: 3 Branches = 3 Balance."
+    },
+    {
+        "q": "भारतीय संविधान की संघीय विशेषता क्या है?",
+        "q_en": "What is the federal feature of the Indian Constitution?",
+        "options": ["केंद्र और राज्य में शक्तियों का विभाजन", "केवल केंद्र को शक्तियाँ", "केवल राज्यों को शक्तियाँ", "कोई विभाजन नहीं"],
+        "options_en": ["Division of powers between center and states", "Powers only to the center", "Powers only to the states", "No division"],
+        "answer": 0,
+        "explanation": "संविधान की सातवीं अनुसूची में केंद्र और राज्यों के बीच शक्तियों का स्पष्ट विभाजन है। Trick: Federal = Divide Power।",
+        "explanation_en": "The Seventh Schedule of the Constitution clearly divides powers between the center and states. Trick: Federal = Divide Power."
+    },
+    {
+        "q": "राज्य की संप्रभुता का अर्थ क्या है?",
+        "q_en": "What does the sovereignty of a state mean?",
+        "options": ["विदेशी कानून मानना", "किसी अन्य शक्ति पर निर्भर रहना", "अपने क्षेत्र में सर्वोच्च अधिकार होना", "जनता के अधीन होना"],
+        "options_en": ["Following foreign laws", "Dependence on another power", "Supreme authority in its territory", "Being under the people"],
+        "answer": 2,
+        "explanation": "संप्रभुता का मतलब है कि राज्य अपने क्षेत्र में स्वतंत्र और सर्वोच्च है, बिना किसी बाहरी हस्तक्षेप के। Trick: संप्रभु = Supreme Power।",
+        "explanation_en": "Sovereignty means the state has supreme and independent authority within its territory, free from external interference. Trick: Sovereign = Supreme Power."
+    },
+    {
+        "q": "निम्न में से कौन राज्य का आवश्यक तत्व नहीं है?",
+        "q_en": "Which of the following is not an essential element of a state?",
+        "options": ["क्षेत्रफल", "जनसंख्या", "सरकार", "सेना"],
+        "options_en": ["Territory", "Population", "Government", "Military"],
+        "answer": 3,
+        "explanation": "राज्य के चार आवश्यक तत्व हैं: क्षेत्र, जनसंख्या, सरकार, और संप्रभुता। सेना आवश्यक नहीं है। Trick: 4 Pillar = भू-जन-सरकार-स्वतंत्रता।",
+        "explanation_en": "The four essential elements of a state are territory, population, government, and sovereignty. The military is not essential. Trick: 4 Pillars = Land-People-Government-Freedom."
+    },
+    {
+        "q": "‘सामाजिक अनुबंध सिद्धांत’ के प्रमुख दार्शनिक कौन थे?",
+        "q_en": "Who were the main philosophers of the Social Contract Theory?",
+        "options": ["प्लेटो और अरस्तू", "होब्स, लॉक और रूसो", "मार्क्स और एंगेल्स", "गांधी और नेहरू"],
+        "options_en": ["Plato and Aristotle", "Hobbes, Locke, and Rousseau", "Marx and Engels", "Gandhi and Nehru"],
+        "answer": 1,
+        "explanation": "होब्स, लॉक, और रूसो ने सामाजिक अनुबंध सिद्धांत का प्रतिपादन किया, जिसमें कहा गया कि राज्य लोगों के आपसी समझौते से बनता है। Trick: HLR = Hobbes, Locke, Rousseau।",
+        "explanation_en": "Hobbes, Locke, and Rousseau proposed the Social Contract Theory, stating that the state is formed by mutual agreement among people. Trick: HLR = Hobbes, Locke, Rousseau."
+    },
+    {
+        "q": "‘हम भारत के लोग’ किस सिद्धांत को दर्शाता है?",
+        "q_en": "‘We the People of India’ reflects which principle?",
+        "options": ["दैवी सिद्धांत", "लोकप्रिय संप्रभुता", "शक्ति सिद्धांत", "न्याय सिद्धांत"],
+        "options_en": ["Divine Theory", "Popular Sovereignty", "Force Theory", "Justice Theory"],
+        "answer": 1,
+        "explanation": "‘हम भारत के लोग’ प्रस्तावना की शुरुआत है, जो लोकप्रिय संप्रभुता को दर्शाती है, अर्थात सत्ता का स्रोत जनता है। Trick: We the People = जनता सर्वोच्च।",
+        "explanation_en": "‘We the People of India’ begins the Preamble, reflecting popular sovereignty, meaning the people are the source of power. Trick: We the People = People Supreme."
+    },
+    {
+        "q": "भारत का संविधान कितने भागों में विभाजित है? (2025 तक)",
+        "q_en": "How many parts is the Indian Constitution divided into? (As of 2025)",
+        "options": ["22", "25", "24", "23"],
+        "options_en": ["22", "25", "24", "23"],
+        "answer": 1,
+        "explanation": "मूल रूप से संविधान में 22 भाग थे, लेकिन संशोधनों के बाद 2025 तक यह 25 भागों में विभाजित है। Trick: भाग बढ़ते हैं → संविधान जीवित है।",
+        "explanation_en": "Originally, the Constitution had 22 parts, but with amendments, it is divided into 25 parts as of 2025. Trick: Parts increase → Constitution is alive."
+    },
+    {
+        "q": "संविधानवाद का सबसे महत्वपूर्ण पहलू क्या है?",
+        "q_en": "What is the most important aspect of Constitutionalism?",
+        "options": ["सेना का शासन", "शक्तियों का नियंत्रण और कानून का शासन", "राजा की सत्ता", "जनता का दमन"],
+        "options_en": ["Military rule", "Control of powers and rule of law", "King's authority", "Suppression of people"],
+        "answer": 1,
+        "explanation": "संविधानवाद का आधार है शक्तियों का नियंत्रण और कानून का शासन, जो सरकार को मनमानी से रोकता है। Trick: वाद = रोकथाम, Law = Rule।",
+        "explanation_en": "The foundation of Constitutionalism is the control of powers and the rule of law, preventing arbitrary governance. Trick: Constitutionalism = Control, Law = Rule."
+    },
+    {
+        "q": "भारत का संविधान विश्व का सबसे बड़ा क्यों कहलाता है?",
+        "q_en": "Why is the Indian Constitution called the largest in the world?",
+        "options": ["इसमें सबसे ज्यादा शब्द हैं", "इसमें सबसे ज्यादा संशोधन हुए हैं", "इसमें सबसे ज्यादा अनुच्छेद और विस्तृत प्रावधान हैं", "यह सबसे पुराना है"],
+        "options_en": ["It has the most words", "It has the most amendments", "It has the most articles and detailed provisions", "It is the oldest"],
+        "answer": 2,
+        "explanation": "भारतीय संविधान में मूल रूप से 395 अनुच्छेद थे, जो अब 470 से अधिक हैं, और इसमें विस्तृत प्रावधान हैं। Trick: भारत = Big Book।",
+        "explanation_en": "The Indian Constitution originally had 395 articles, now over 470, with detailed provisions. Trick: India = Big Book."
+    },
+    {
+        "q": "संविधान किसे ‘नागरिकों की आकांक्षाओं का दर्पण’ कहा जाता है?",
+        "q_en": "What is called the ‘mirror of citizens’ aspirations’ in the Constitution?",
+        "options": ["प्रस्तावना", "मौलिक अधिकार", "मौलिक कर्तव्य", "राज्य नीति निदेशक तत्व"],
+        "options_en": ["Preamble", "Fundamental Rights", "Fundamental Duties", "Directive Principles of State Policy"],
+        "answer": 0,
+        "explanation": "प्रस्तावना संविधान की मूल भावना और नागरिकों की आकांक्षाओं को दर्शाती है। Trick: Mirror of Constitution = Preamble।",
+        "explanation_en": "The Preamble reflects the core spirit and aspirations of the citizens in the Constitution. Trick: Mirror of Constitution = Preamble."
+    },
+    {
+        "q": "भारतीय संविधान किस शासन प्रणाली पर आधारित है?",
+        "q_en": "What system of governance is the Indian Constitution based on?",
+        "options": ["राजतंत्र", "गणतंत्र", "सैन्य शासन", "निरंकुश शासन"],
+        "options_en": ["Monarchy", "Republic", "Military rule", "Absolute rule"],
+        "answer": 1,
+        "explanation": "भारत एक गणतंत्र है, जहाँ जनता अपने प्रतिनिधियों को चुनती है और राष्ट्रपति निर्वाचित होता है। Trick: गण = जनता, तंत्र = शासन।",
+        "explanation_en": "India is a republic where the people elect their representatives, and the President is elected. Trick: Gana = People, Tantra = Governance."
+    },
+    {
+        "q": "स्वतंत्र न्यायपालिका क्यों आवश्यक है?",
+        "q_en": "Why is an independent judiciary essential?",
+        "options": ["सरकार को मजबूत करने के लिए", "नागरिक अधिकारों की रक्षा और संविधान की सुरक्षा के लिए", "सेना की शक्ति बढ़ाने के लिए", "संसद को सर्वोच्च बनाने के लिए"],
+        "options_en": ["To strengthen the government", "To protect citizens’ rights and the Constitution", "To enhance military power", "To make Parliament supreme"],
+        "answer": 1,
+        "explanation": "स्वतंत्र न्यायपालिका लोकतंत्र का आधार है, जो नागरिकों के अधिकारों और संविधान की रक्षा करती है। Trick: Nyay = Nagrikon ki Raksha।",
+        "explanation_en": "An independent judiciary is the foundation of democracy, protecting citizens’ rights and the Constitution. Trick: Justice = Protection of Citizens."
+    },
+
+    {
+        "q": "‘पंचवर्षीय योजना’ का विचार किस देश से लिया गया था?",
+        "q_en": "The concept of ‘Five-Year Plan’ was adopted from which country?",
+        "options": ["रूस (सोवियत संघ)", "अमेरिका", "जापान", "इंग्लैंड"],
+        "options_en": ["Russia (Soviet Union)", "USA", "Japan", "England"],
+        "answer": 0,
+        "explanation": "भारत ने पंचवर्षीय योजनाओं की अवधारणा सोवियत संघ (USSR) के नियोजित अर्थव्यवस्था मॉडल से ग्रहण की। Trick: योजना = सोवियत मॉडल (USSR से कॉपी)।",
+        "explanation_en": "India adopted the concept of Five-Year Plans from the Soviet Union's planned economy model. Trick: Plan = Soviet Model (Copied from USSR)."
+    },
+    {
+        "q": "भारत की पहली पंचवर्षीय योजना का मुख्य लक्ष्य क्या था?",
+        "q_en": "What was the main objective of India’s First Five-Year Plan?",
+        "options": ["औद्योगीकरण", "कृषि विकास", "निर्यात", "ग्रामीण बैंकिंग"],
+        "options_en": ["Industrialization", "Agricultural development", "Export", "Rural banking"],
+        "answer": 1,
+        "explanation": "पहली पंचवर्षीय योजना (1951-56) का फोकस कृषि विकास और खाद्य सुरक्षा पर था। Trick: 1st Plan = Agriculture First।",
+        "explanation_en": "The First Five-Year Plan (1951-56) focused on agricultural development and food security. Trick: 1st Plan = Agriculture First."
+    },
+    {
+        "q": "‘हरित क्रांति’ का मुख्य संबंध किससे है?",
+        "q_en": "What is the ‘Green Revolution’ primarily associated with?",
+        "options": ["दुग्ध उत्पादन", "कृषि उत्पादन", "औद्योगिक विकास", "खनन"],
+        "options_en": ["Milk production", "Agricultural production", "Industrial development", "Mining"],
+        "answer": 1,
+        "explanation": "हरित क्रांति ने उच्च उपज वाली किस्मों (HYV) और आधुनिक कृषि तकनीकों से कृषि उत्पादन में वृद्धि की। Trick: Green = फसल।",
+        "explanation_en": "The Green Revolution increased agricultural production through high-yield variety (HYV) seeds and modern farming techniques. Trick: Green = Crops."
+    },
+    {
+        "q": "हरित क्रांति के जनक भारत में कौन कहलाते हैं?",
+        "q_en": "Who is considered the father of the Green Revolution in India?",
+        "options": ["एम. एस. स्वामीनाथन", "वर्मा", "वी. कुरियन", "सी. रंगराजन"],
+        "options_en": ["M.S. Swaminathan", "Verma", "V. Kurien", "C. Rangarajan"],
+        "answer": 0,
+        "explanation": "एम. एस. स्वामीनाथन ने भारत में हरित क्रांति के लिए वैज्ञानिक अनुसंधान और नीतियों का नेतृत्व किया। Trick: Swami of Green Revolution।",
+        "explanation_en": "M.S. Swaminathan led scientific research and policies for the Green Revolution in India. Trick: Swami of Green Revolution."
+    },
+    {
+        "q": "श्वेत क्रांति किससे संबंधित है?",
+        "q_en": "What is the ‘White Revolution’ associated with?",
+        "options": ["दुग्ध उत्पादन", "मत्स्य", "गेहूँ", "पेट्रोल"],
+        "options_en": ["Milk production", "Fisheries", "Wheat", "Petrol"],
+        "answer": 0,
+        "explanation": "श्वेत क्रांति ने भारत में दुग्ध उत्पादन को बढ़ाने के लिए ऑपरेशन फ्लड शुरू किया। Trick: White = दूध।",
+        "explanation_en": "The White Revolution boosted milk production in India through Operation Flood. Trick: White = Milk."
+    },
+    {
+        "q": "श्वेत क्रांति के जनक कौन?",
+        "q_en": "Who is the father of the White Revolution?",
+        "options": ["एम. एस. स्वामीनाथन", "डॉ. वी. कुरियन", "मोहन सिंह", "रंगराजन"],
+        "options_en": ["M.S. Swaminathan", "Dr. V. Kurien", "Mohan Singh", "Rangarajan"],
+        "answer": 1,
+        "explanation": "डॉ. वी. कुरियन ने ऑपरेशन फ्लड के माध्यम से भारत को दुग्ध उत्पादन में आत्मनिर्भर बनाया। Trick: Kurien = Milkman of India।",
+        "explanation_en": "Dr. V. Kurien made India self-sufficient in milk production through Operation Flood. Trick: Kurien = Milkman of India."
+    },
+    {
+        "q": "‘नीली क्रांति’ किससे संबंधित है?",
+        "q_en": "What is the ‘Blue Revolution’ associated with?",
+        "options": ["मछली उत्पादन", "कोयला", "चावल", "बिजली"],
+        "options_en": ["Fish production", "Coal", "Rice", "Electricity"],
+        "answer": 0,
+        "explanation": "नीली क्रांति ने भारत में मत्स्य पालन और मछली उत्पादन को बढ़ावा दिया। Trick: Blue = पानी → मछली।",
+        "explanation_en": "The Blue Revolution promoted fisheries and fish production in India. Trick: Blue = Water → Fish."
+    },
+    {
+        "q": "‘स्वर्ण क्रांति’ किससे संबंधित है?",
+        "q_en": "What is the ‘Golden Revolution’ associated with?",
+        "options": ["तेल बीज उत्पादन", "सोना", "गेहूँ", "बिजली"],
+        "options_en": ["Oilseed production", "Gold", "Wheat", "Electricity"],
+        "answer": 0,
+        "explanation": "स्वर्ण क्रांति का उद्देश्य तेल बीज और तिलहन उत्पादन को बढ़ाना था। Trick: Gold = तेल-तिलहन।",
+        "explanation_en": "The Golden Revolution aimed to increase oilseed and edible oil production. Trick: Gold = Oil-Oilseeds."
+    },
+    {
+        "q": "भारत में योजना आयोग की स्थापना कब हुई?",
+        "q_en": "When was the Planning Commission established in India?",
+        "options": ["1947", "1950", "1951", "1965"],
+        "options_en": ["1947", "1950", "1951", "1965"],
+        "answer": 1,
+        "explanation": "योजना आयोग की स्थापना 15 मार्च 1950 को हुई थी। Trick: गणतंत्र बनने के साल (1950)।",
+        "explanation_en": "The Planning Commission was established on 15 March 1950. Trick: Year of Republic (1950)."
+    },
+    {
+        "q": "NITI Aayog की स्थापना कब हुई?",
+        "q_en": "When was NITI Aayog established?",
+        "options": ["2014", "2015", "2016", "2017"],
+        "options_en": ["2014", "2015", "2016", "2017"],
+        "answer": 1,
+        "explanation": "NITI Aayog ने 1 जनवरी 2015 को योजना आयोग की जगह ली। Trick: Modi जी का नया मॉडल = 2015।",
+        "explanation_en": "NITI Aayog replaced the Planning Commission on 1 January 2015. Trick: Modi’s New Model = 2015."
+    },
+    {
+        "q": "NITI Aayog के प्रथम उपाध्यक्ष कौन बने?",
+        "q_en": "Who was the first Vice-Chairman of NITI Aayog?",
+        "options": ["अरविंद पनगड़िया", "रघुराम राजन", "अमर्त्य सेन", "मोंटेक सिंह अहलूवालिया"],
+        "options_en": ["Arvind Panagariya", "Raghuram Rajan", "Amartya Sen", "Montek Singh Ahluwalia"],
+        "answer": 0,
+        "explanation": "अरविंद पनगड़िया NITI Aayog के पहले उपाध्यक्ष थे, जिन्होंने 2015 से 2017 तक कार्य किया।",
+        "explanation_en": "Arvind Panagariya was the first Vice-Chairman of NITI Aayog, serving from 2015 to 2017."
+    },
+    {
+        "q": "राष्ट्रीय आय की गणना सबसे पहले भारत में किसने की थी?",
+        "q_en": "Who first calculated National Income in India?",
+        "options": ["दादाभाई नौरोजी", "महालनोबिस", "अमर्त्य सेन", "रंगराजन"],
+        "options_en": ["Dadabhai Naoroji", "Mahalanobis", "Amartya Sen", "Rangarajan"],
+        "answer": 0,
+        "explanation": "दादाभाई नौरोजी ने 1868 में ‘Poverty and Un-British Rule in India’ में राष्ट्रीय आय का पहला अनुमान लगाया। Trick: नौरोजी = Drain Theory + National Income।",
+        "explanation_en": "Dadabhai Naoroji first estimated National Income in 1868 in ‘Poverty and Un-British Rule in India’. Trick: Naoroji = Drain Theory + National Income."
+    },
+    {
+        "q": "भारत में ‘Drain of Wealth’ का सिद्धांत किसने दिया?",
+        "q_en": "Who gave the ‘Drain of Wealth’ theory in India?",
+        "options": ["दादाभाई नौरोजी", "गोखले", "तिलक", "अम्बेडकर"],
+        "options_en": ["Dadabhai Naoroji", "Gokhale", "Tilak", "Ambedkar"],
+        "answer": 0,
+        "explanation": "दादाभाई नौरोजी ने ‘Drain of Wealth’ सिद्धांत दिया, जिसमें उन्होंने बताया कि भारत की संपत्ति ब्रिटेन को हस्तांतरित हो रही थी।",
+        "explanation_en": "Dadabhai Naoroji proposed the ‘Drain of Wealth’ theory, explaining how India’s wealth was transferred to Britain."
+    },
+    {
+        "q": "भारत में Planning Commission के पिता किसे कहा जाता है?",
+        "q_en": "Who is considered the father of the Planning Commission in India?",
+        "options": ["जवाहरलाल नेहरू", "महालनोबिस", "वल्लभभाई पटेल", "रघुराम राजन"],
+        "options_en": ["Jawaharlal Nehru", "Mahalanobis", "Vallabhbhai Patel", "Raghuram Rajan"],
+        "answer": 1,
+        "explanation": "पी.सी. महालनोबिस ने भारत में नियोजित अर्थव्यवस्था और पंचवर्षीय योजनाओं की नींव रखी।",
+        "explanation_en": "P.C. Mahalanobis laid the foundation for India’s planned economy and Five-Year Plans."
+    },
+    {
+        "q": "दूसरी पंचवर्षीय योजना का मुख्य लक्ष्य क्या था?",
+        "q_en": "What was the main objective of the Second Five-Year Plan?",
+        "options": ["भारी उद्योगों का विकास", "कृषि", "शिक्षा", "गरीबी उन्मूलन"],
+        "options_en": ["Development of heavy industries", "Agriculture", "Education", "Poverty eradication"],
+        "answer": 0,
+        "explanation": "दूसरी पंचवर्षीय योजना (1956-61) का फोकस भारी उद्योगों और औद्योगीकरण पर था। Trick: 2nd Plan = Industrial।",
+        "explanation_en": "The Second Five-Year Plan (1956-61) focused on heavy industries and industrialization. Trick: 2nd Plan = Industrial."
+    },
+    {
+        "q": "भारत में बेरोजगारी का सबसे बड़ा कारण कौन सा है?",
+        "q_en": "What is the biggest cause of unemployment in India?",
+        "options": ["जनसंख्या वृद्धि", "औद्योगिक क्रांति", "तकनीकी विकास", "निवेश अधिक"],
+        "options_en": ["Population growth", "Industrial revolution", "Technological development", "Excess investment"],
+        "answer": 0,
+        "explanation": "भारत में जनसंख्या वृद्धि के कारण रोजगार के अवसरों की तुलना में श्रम शक्ति में तेजी से वृद्धि हुई है।",
+        "explanation_en": "Population growth in India has led to a rapid increase in the labor force compared to available job opportunities."
+    },
+    {
+        "q": "GDP का पूर्ण रूप है?",
+        "q_en": "What is the full form of GDP?",
+        "options": ["Gross Domestic Product", "Gross Department Plan", "General Domestic Policy", "Gross Division Product"],
+        "options_en": ["Gross Domestic Product", "Gross Department Plan", "General Domestic Policy", "Gross Division Product"],
+        "answer": 0,
+        "explanation": "GDP (Gross Domestic Product) देश की सीमाओं के भीतर एक निश्चित समय में उत्पादित सभी अंतिम वस्तुओं और सेवाओं का कुल मूल्य है।",
+        "explanation_en": "GDP (Gross Domestic Product) is the total value of all final goods and services produced within a country’s borders in a specific period."
+    },
+    {
+        "q": "GNP का अर्थ क्या है?",
+        "q_en": "What does GNP mean?",
+        "options": ["Gross National Product", "Gross Net Production", "Great National Plan", "General Net Product"],
+        "options_en": ["Gross National Product", "Gross Net Production", "Great National Plan", "General Net Product"],
+        "answer": 0,
+        "explanation": "GNP (Gross National Product) देशवासियों द्वारा देश और विदेश में उत्पादित सभी वस्तुओं और सेवाओं का कुल मूल्य है।",
+        "explanation_en": "GNP (Gross National Product) is the total value of all goods and services produced by a country’s residents, both domestically and abroad."
+    },
+    {
+        "q": "भारत में बजट किसके द्वारा प्रस्तुत किया जाता है?",
+        "q_en": "Who presents the budget in India?",
+        "options": ["राष्ट्रपति", "प्रधानमंत्री", "वित्त मंत्री", "RBI गवर्नर"],
+        "options_en": ["President", "Prime Minister", "Finance Minister", "RBI Governor"],
+        "answer": 2,
+        "explanation": "भारत में वित्त मंत्री संसद में वार्षिक बजट प्रस्तुत करता है।",
+        "explanation_en": "The Finance Minister presents the annual budget in the Indian Parliament."
+    },
+    {
+        "q": "भारत का प्रथम बजट किसने प्रस्तुत किया था?",
+        "q_en": "Who presented India’s first budget?",
+        "options": ["आर. के. शनमुखम चेट्टी", "नेहरू", "पटेल", "गांधी"],
+        "options_en": ["R.K. Shanmukham Chetty", "Nehru", "Patel", "Gandhi"],
+        "answer": 0,
+        "explanation": "आर. के. शनमुखम चेट्टी ने 26 नवंबर 1947 को भारत का पहला बजट प्रस्तुत किया।",
+        "explanation_en": "R.K. Shanmukham Chetty presented India’s first budget on 26 November 1947."
+    },
+    {
+        "q": "अंतर्राष्ट्रीय मुद्रा कोष (IMF) का मुख्यालय कहाँ है?",
+        "q_en": "Where is the headquarters of the International Monetary Fund (IMF)?",
+        "options": ["न्यूयॉर्क", "वाशिंगटन D.C.", "जेनेवा", "पेरिस"],
+        "options_en": ["New York", "Washington D.C.", "Geneva", "Paris"],
+        "answer": 1,
+        "explanation": "IMF का मुख्यालय वाशिंगटन D.C. में है।",
+        "explanation_en": "The IMF headquarters is located in Washington D.C."
+    },
+    {
+        "q": "विश्व बैंक का मुख्यालय कहाँ है?",
+        "q_en": "Where is the headquarters of the World Bank?",
+        "options": ["लंदन", "वाशिंगटन D.C.", "पेरिस", "जेनेवा"],
+        "options_en": ["London", "Washington D.C.", "Paris", "Geneva"],
+        "answer": 1,
+        "explanation": "विश्व बैंक का मुख्यालय भी वाशिंगटन D.C. में स्थित है।",
+        "explanation_en": "The World Bank headquarters is also located in Washington D.C."
+    },
+    {
+        "q": "WTO (World Trade Organization) का मुख्यालय कहाँ है?",
+        "q_en": "Where is the headquarters of the World Trade Organization (WTO)?",
+        "options": ["वाशिंगटन", "जेनेवा", "पेरिस", "लंदन"],
+        "options_en": ["Washington", "Geneva", "Paris", "London"],
+        "answer": 1,
+        "explanation": "WTO का मुख्यालय जेनेवा, स्विट्जरलैंड में है।",
+        "explanation_en": "The WTO headquarters is located in Geneva, Switzerland."
+    },
+    {
+        "q": "भारत में प्रत्यक्ष कर किसे कहते हैं?",
+        "q_en": "What is a direct tax in India?",
+        "options": ["आयकर", "सेवा कर", "उत्पाद शुल्क", "बिक्री कर"],
+        "options_en": ["Income tax", "Service tax", "Excise duty", "Sales tax"],
+        "answer": 0,
+        "explanation": "प्रत्यक्ष कर वह है जो व्यक्ति या संस्था सीधे सरकार को देती है, जैसे आयकर।",
+        "explanation_en": "A direct tax is paid directly to the government by an individual or entity, such as income tax."
+    },
+    {
+        "q": "अप्रत्यक्ष कर का उदाहरण कौन है?",
+        "q_en": "What is an example of an indirect tax?",
+        "options": ["आयकर", "संपत्ति कर", "GST", "धनकर"],
+        "options_en": ["Income tax", "Property tax", "GST", "Wealth tax"],
+        "answer": 2,
+        "explanation": "अप्रत्यक्ष कर वह है जो वस्तुओं और सेवाओं पर लगाया जाता है, जैसे GST (Goods and Services Tax)।",
+        "explanation_en": "An indirect tax is levied on goods and services, such as GST (Goods and Services Tax)."
+    },
+    {
+        "q": "भारत में GST कब लागू हुआ?",
+        "q_en": "When was GST implemented in India?",
+        "options": ["1 जुलाई 2017", "1 जनवरी 2016", "1 मार्च 2018", "2 अक्टूबर 2015"],
+        "options_en": ["1 July 2017", "1 January 2016", "1 March 2018", "2 October 2015"],
+        "answer": 0,
+        "explanation": "GST (Goods and Services Tax) भारत में 1 जुलाई 2017 को लागू हुआ।",
+        "explanation_en": "GST (Goods and Services Tax) was implemented in India on 1 July 2017."
+    },
+
+
+    {
+        "q": "भारत में मौद्रिक नीति (Monetary Policy) कौन बनाता है?",
+        "q_en": "Who formulates the Monetary Policy in India?",
+        "options": ["वित्त मंत्रालय", "RBI", "संसद", "नीति आयोग"],
+        "options_en": ["Ministry of Finance", "RBI", "Parliament", "NITI Aayog"],
+        "answer": 1,
+        "explanation": "मौद्रिक नीति पैसे की आपूर्ति को नियंत्रित करती है ताकि मुद्रास्फीति और आर्थिक विकास संतुलित रहे, और इसे रिज़र्व बैंक ऑफ इंडिया (RBI) बनाता है। Trick: Money = Monetary = RBI।",
+        "explanation_en": "Monetary Policy regulates money supply to balance inflation and economic growth, and it is formulated by the Reserve Bank of India (RBI). Trick: Money = Monetary = RBI."
+    },
+    {
+        "q": "भारत में राजकोषीय नीति (Fiscal Policy) कौन बनाता है?",
+        "q_en": "Who formulates the Fiscal Policy in India?",
+        "options": ["RBI", "वित्त मंत्रालय (Ministry of Finance)", "संसद", "नीति आयोग"],
+        "options_en": ["RBI", "Ministry of Finance", "Parliament", "NITI Aayog"],
+        "answer": 1,
+        "explanation": "राजकोषीय नीति कर (Tax) और सरकारी खर्च से संबंधित है, जिसे वित्त मंत्रालय तैयार करता है। Trick: Fiscal = Finance।",
+        "explanation_en": "Fiscal Policy deals with taxation and government expenditure, formulated by the Ministry of Finance. Trick: Fiscal = Finance."
+    },
+    {
+        "q": "महँगाई (Inflation) का मुख्य कारण क्या है?",
+        "q_en": "What is the main cause of inflation?",
+        "options": ["मांग और आपूर्ति का असंतुलन", "तकनीकी विकास", "उत्पादन बढ़ना", "जनसंख्या कम होना"],
+        "options_en": ["Imbalance between demand and supply", "Technological development", "Increased production", "Population decline"],
+        "answer": 0,
+        "explanation": "जब मांग आपूर्ति से अधिक हो जाती है, तो कीमतें बढ़ती हैं, जिससे महँगाई होती है। Trick: Demand ↑ – Supply ↓ = महँगाई ↑।",
+        "explanation_en": "When demand exceeds supply, prices rise, leading to inflation. Trick: Demand ↑ – Supply ↓ = Inflation ↑."
+    },
+    {
+        "q": "Demand-Pull Inflation कब होती है?",
+        "q_en": "When does Demand-Pull Inflation occur?",
+        "options": ["जब मांग ज्यादा हो और आपूर्ति कम", "जब आपूर्ति ज्यादा और मांग कम", "जब उत्पादन लागत कम हो", "जब कर घटा दिया जाए"],
+        "options_en": ["When demand is high and supply is low", "When supply is high and demand is low", "When production cost is low", "When taxes are reduced"],
+        "answer": 0,
+        "explanation": "जब मांग अधिक होती है और आपूर्ति उसका साथ नहीं दे पाती, तो कीमतें बढ़ती हैं, जिसे Demand-Pull Inflation कहते हैं। Trick: Demand खींचे → Price ऊपर।",
+        "explanation_en": "When demand exceeds supply, prices increase, causing Demand-Pull Inflation. Trick: Demand Pulls → Price Up."
+    },
+    {
+        "q": "Cost-Push Inflation कब होती है?",
+        "q_en": "When does Cost-Push Inflation occur?",
+        "options": ["जब उत्पादन लागत बढ़ जाए", "जब कर घटा दिया जाए", "जब आय बढ़े", "जब जनसंख्या घटे"],
+        "options_en": ["When production costs increase", "When taxes are reduced", "When income increases", "When population decreases"],
+        "answer": 0,
+        "explanation": "जब उत्पादन लागत (जैसे पेट्रोल, कच्चा माल) बढ़ती है, तो वस्तुओं की कीमतें बढ़ जाती हैं, जिससे Cost-Push Inflation होती है। Trick: Cost बढ़े → Price धकेले ऊपर।",
+        "explanation_en": "When production costs (e.g., petrol, raw materials) rise, the prices of goods increase, leading to Cost-Push Inflation. Trick: Cost Rises → Price Pushed Up."
+    },
+    {
+        "q": "मुद्रास्फीति (Inflation) को नियंत्रित करने के लिए RBI क्या करता है?",
+        "q_en": "What does the RBI do to control inflation?",
+        "options": ["Repo Rate बढ़ाता है", "Repo Rate घटाता है", "कर घटाता है", "सब्सिडी बढ़ाता है"],
+        "options_en": ["Increases Repo Rate", "Decreases Repo Rate", "Reduces taxes", "Increases subsidies"],
+        "answer": 0,
+        "explanation": "RBI Repo Rate बढ़ाकर बैंकों के लिए कर्ज महँगा करता है, जिससे बाजार में पैसे की आपूर्ति कम होती है और महँगाई नियंत्रित होती है। Trick: Repo ↑ → Rupee Supply ↓।",
+        "explanation_en": "RBI increases the Repo Rate to make loans costlier for banks, reducing money supply in the market and controlling inflation. Trick: Repo ↑ → Rupee Supply ↓."
+    },
+    {
+        "q": "Repo Rate क्या है?",
+        "q_en": "What is the Repo Rate?",
+        "options": ["RBI द्वारा बैंकों को दिये जाने वाला loan का rate", "Bank द्वारा जनता को loan rate", "कर rate", "GDP growth rate"],
+        "options_en": ["Rate at which RBI lends to banks", "Rate at which banks lend to the public", "Tax rate", "GDP growth rate"],
+        "answer": 0,
+        "explanation": "Repo Rate वह ब्याज दर है जिस पर बैंक RBI से अल्पकालिक कर्ज लेते हैं। Trick: Repo = RBI से Loan लो।",
+        "explanation_en": "Repo Rate is the interest rate at which banks borrow short-term loans from RBI. Trick: Repo = Borrow Loan from RBI."
+    },
+    {
+        "q": "Reverse Repo Rate क्या है?",
+        "q_en": "What is the Reverse Repo Rate?",
+        "options": ["जब RBI बैंकों से loan लेता है", "जब Bank जनता से loan लेता है", "कर संग्रह", "सब्सिडी"],
+        "options_en": ["When RBI borrows from banks", "When banks borrow from the public", "Tax collection", "Subsidy"],
+        "answer": 0,
+        "explanation": "Reverse Repo Rate वह दर है जिस पर बैंक अपना अतिरिक्त पैसा RBI में जमा करते हैं और RBI इसके लिए ब्याज देता है। Trick: Reverse = उल्टा → अब RBI ले रहा loan।",
+        "explanation_en": "Reverse Repo Rate is the rate at which banks deposit surplus funds with RBI, and RBI pays interest. Trick: Reverse = Opposite → RBI Borrows."
+    },
+    {
+        "q": "CRR (Cash Reserve Ratio) क्या है?",
+        "q_en": "What is CRR (Cash Reserve Ratio)?",
+        "options": ["Bank का वह पैसा जो RBI के पास cash के रूप में रखना अनिवार्य है", "Bank का loan rate", "कर", "सब्सिडी"],
+        "options_en": ["Cash that banks must keep with RBI", "Bank’s loan rate", "Tax", "Subsidy"],
+        "answer": 0,
+        "explanation": "CRR वह अनुपात है जिसके तहत बैंकों को अपनी जमा राशि का एक हिस्सा RBI के पास नकद रखना होता है। Trick: C = Cash, R = Reserve, R = RBI।",
+        "explanation_en": "CRR is the percentage of deposits that banks must keep as cash with RBI. Trick: C = Cash, R = Reserve, R = RBI."
+    },
+    {
+        "q": "SLR (Statutory Liquidity Ratio) क्या है?",
+        "q_en": "What is SLR (Statutory Liquidity Ratio)?",
+        "options": ["Bank को अपनी deposits का एक हिस्सा gold/govt. securities में रखना होता है", "कर rate", "Loan rate", "सब्सिडी"],
+        "options_en": ["Percentage of deposits banks must hold in gold/govt. securities", "Tax rate", "Loan rate", "Subsidy"],
+        "answer": 0,
+        "explanation": "SLR वह अनुपात है जिसके तहत बैंकों को अपनी जमा राशि का एक हिस्सा सोने, नकद, या सरकारी प्रतिभूतियों में रखना होता है, जिससे बैंकिंग प्रणाली स्थिर रहती है। Trick: SLR = Securities + Liquidity + Ratio।",
+        "explanation_en": "SLR is the percentage of deposits banks must hold in gold, cash, or government securities to ensure banking system stability. Trick: SLR = Securities + Liquidity + Ratio."
+    },
+    {
+        "q": "भारत में ‘हिंदू रेट ऑफ ग्रोथ’ किसे कहा गया?",
+        "q_en": "What is referred to as the ‘Hindu Rate of Growth’ in India?",
+        "options": ["3.5% Growth (1950–80)", "10% Growth", "Negative Growth", "20% Growth"],
+        "options_en": ["3.5% Growth (1950–80)", "10% Growth", "Negative Growth", "20% Growth"],
+        "answer": 0,
+        "explanation": "1950-80 के दौरान भारत की आर्थिक वृद्धि दर लगभग 3.5% थी, जिसे अर्थशास्त्री राज कृष्ण ने ‘हिंदू रेट ऑफ ग्रोथ’ कहा। Trick: Hindu Rate = Half Growth।",
+        "explanation_en": "During 1950–80, India’s economic growth rate was around 3.5%, termed the ‘Hindu Rate of Growth’ by economist Raj Krishna. Trick: Hindu Rate = Half Growth."
+    },
+    {
+        "q": "भारत में आर्थिक सुधार (LPG Policy) कब लागू हुई?",
+        "q_en": "When were economic reforms (LPG Policy) introduced in India?",
+        "options": ["1991", "1980", "2000", "1975"],
+        "options_en": ["1991", "1980", "2000", "1975"],
+        "answer": 0,
+        "explanation": "1991 में नरसिम्हा राव सरकार और वित्त मंत्री मनमोहन सिंह ने उदारीकरण, निजीकरण, और वैश्वीकरण (LPG) नीति लागू की। Trick: 1991 = New Economic Policy।",
+        "explanation_en": "In 1991, the Narasimha Rao government and Finance Minister Manmohan Singh introduced the LPG (Liberalisation, Privatisation, Globalisation) policy. Trick: 1991 = New Economic Policy."
+    },
+    {
+        "q": "FDI (Foreign Direct Investment) का मतलब?",
+        "q_en": "What does FDI (Foreign Direct Investment) mean?",
+        "options": ["विदेश से सीधा निवेश", "विदेश से Loan", "निर्यात", "कर"],
+        "options_en": ["Direct investment from abroad", "Loan from abroad", "Export", "Tax"],
+        "answer": 0,
+        "explanation": "FDI तब होता है जब कोई विदेशी कंपनी भारत में व्यवसाय शुरू करती है या पूंजी निवेश करती है। Trick: D = Direct Investment।",
+        "explanation_en": "FDI occurs when a foreign company starts a business or invests capital in India. Trick: D = Direct Investment."
+    },
+    {
+        "q": "FII (Foreign Institutional Investors) का मतलब?",
+        "q_en": "What does FII (Foreign Institutional Investors) mean?",
+        "options": ["विदेशी संस्थान जो share market में पैसा लगाते हैं", "विदेशी loan", "निर्यात", "कर"],
+        "options_en": ["Foreign institutions investing in the stock market", "Foreign loan", "Export", "Tax"],
+        "answer": 0,
+        "explanation": "FII में विदेशी बैंक, बीमा कंपनियाँ, या म्यूचुअल फंड भारत के शेयर बाजार में निवेश करते हैं। Trick: I = Institutional (stock market वाले)।",
+        "explanation_en": "FII involves foreign banks, insurance companies, or mutual funds investing in India’s stock market. Trick: I = Institutional (stock market players)."
+    },
+    {
+        "q": "भारत का सबसे बड़ा Public Sector Bank कौन है?",
+        "q_en": "Which is the largest Public Sector Bank in India?",
+        "options": ["PNB", "BOB", "SBI", "ICICI"],
+        "options_en": ["PNB", "BOB", "SBI", "ICICI"],
+        "answer": 2,
+        "explanation": "भारतीय स्टेट बैंक (SBI) भारत का सबसे बड़ा सार्वजनिक क्षेत्र का बैंक है। Trick: SBI = Sabse Bada India।",
+        "explanation_en": "State Bank of India (SBI) is the largest public sector bank in India. Trick: SBI = Biggest India."
+    },
+    {
+        "q": "SEBI का गठन कब हुआ?",
+        "q_en": "When was SEBI established?",
+        "options": ["1988", "1992", "2000", "2010"],
+        "options_en": ["1988", "1992", "2000", "2010"],
+        "answer": 0,
+        "explanation": "SEBI (Securities and Exchange Board of India) की स्थापना 1988 में हुई, लेकिन इसे 1992 में कानूनी दर्जा मिला। यह शेयर बाजार का नियामक है। Trick: Stock Market का Police = SEBI।",
+        "explanation_en": "SEBI (Securities and Exchange Board of India) was established in 1988 but gained statutory status in 1992. It regulates the stock market. Trick: Stock Market Police = SEBI."
+    },
+    {
+        "q": "भारत का सबसे बड़ा tax कौन सा है?",
+        "q_en": "Which is the largest tax in India?",
+        "options": ["GST", "Income Tax", "Corporation Tax", "Customs Duty"],
+        "options_en": ["GST", "Income Tax", "Corporation Tax", "Customs Duty"],
+        "answer": 2,
+        "explanation": "कॉरपोरेशन टैक्स, जो कंपनियों की आय पर लगता है, सरकार की आय में सबसे बड़ा योगदान देता है। Trick: Company Tax = Corporation Tax।",
+        "explanation_en": "Corporation Tax, levied on companies’ income, contributes the largest share to government revenue. Trick: Company Tax = Corporation Tax."
+    },
+    {
+        "q": "भारत में सबसे अधिक revenue किस direct tax से आता है?",
+        "q_en": "Which direct tax contributes the most revenue in India?",
+        "options": ["आयकर (Income Tax)", "संपत्ति कर", "संपदा कर", "Agriculture Tax"],
+        "options_en": ["Income Tax", "Property Tax", "Wealth Tax", "Agriculture Tax"],
+        "answer": 0,
+        "explanation": "प्रत्यक्ष करों में आयकर (Income Tax) सरकार की आय में सबसे बड़ा योगदान देता है। Trick: Income = सबसे बड़ी आमदनी।",
+        "explanation_en": "Among direct taxes, Income Tax contributes the largest share to government revenue. Trick: Income = Biggest Revenue."
+    },
+    {
+        "q": "भारत में सबसे ज्यादा revenue (Indirect Tax) किससे आता है?",
+        "q_en": "Which indirect tax contributes the most revenue in India?",
+        "options": ["GST", "Excise Duty", "Customs", "Service Tax"],
+        "options_en": ["GST", "Excise Duty", "Customs", "Service Tax"],
+        "answer": 0,
+        "explanation": "GST (Goods and Services Tax) वस्तुओं और सेवाओं पर लागू होता है और अप्रत्यक्ष करों में सबसे अधिक राजस्व देता है। Trick: Goods+Services = GST।",
+        "explanation_en": "GST (Goods and Services Tax) is levied on goods and services and contributes the most to indirect tax revenue. Trick: Goods+Services = GST."
+    },
+    {
+        "q": "विश्व व्यापार संगठन (WTO) कब अस्तित्व में आया?",
+        "q_en": "When did the World Trade Organization (WTO) come into existence?",
+        "options": ["1995", "1991", "2000", "1985"],
+        "options_en": ["1995", "1991", "2000", "1985"],
+        "answer": 0,
+        "explanation": "WTO 1995 में स्थापित हुआ, जो GATT (1948) का उत्तराधिकारी है। Trick: WTO = World Trade → 1995 से Start।",
+        "explanation_en": "The WTO was established in 1995, succeeding GATT (1948). Trick: WTO = World Trade → Started in 1995."
+    },
+    {
+        "q": "IMF (International Monetary Fund) का गठन कब हुआ?",
+        "q_en": "When was the International Monetary Fund (IMF) formed?",
+        "options": ["1944", "1947", "1950", "1960"],
+        "options_en": ["1944", "1947", "1950", "1960"],
+        "answer": 0,
+        "explanation": "IMF की स्थापना 1944 में ब्रेटन वुड्स सम्मेलन में हुई, जो मुद्रा स्थिरता और ऋण प्रदान करने का कार्य करता है। Trick: IMF = International Money Fund (1944)।",
+        "explanation_en": "The IMF was formed in 1944 at the Bretton Woods Conference to ensure currency stability and provide loans. Trick: IMF = International Money Fund (1944)."
+    },
+    {
+        "q": "भारत IMF का सदस्य कब बना?",
+        "q_en": "When did India become a member of the IMF?",
+        "options": ["1944", "1945", "1947", "1950"],
+        "options_en": ["1944", "1945", "1947", "1950"],
+        "answer": 1,
+        "explanation": "भारत 1945 में IMF का सदस्य बना।",
+        "explanation_en": "India became a member of the IMF in 1945."
+    },
+    {
+        "q": "RBI का राष्ट्रीयकरण कब हुआ?",
+        "q_en": "When was the RBI nationalized?",
+        "options": ["1947", "1949", "1950", "1951"],
+        "options_en": ["1947", "1949", "1950", "1951"],
+        "answer": 1,
+        "explanation": "RBI की स्थापना 1935 में हुई और इसका राष्ट्रीयकरण 1 जनवरी 1949 को हुआ। Trick: RBI = 35 जन्म, 49 राष्ट्रीयकरण।",
+        "explanation_en": "RBI was established in 1935 and nationalized on 1 January 1949. Trick: RBI = Born in 35, Nationalized in 49."
+    },
+    {
+        "q": "भारत में बैंकिंग राष्ट्रीयकरण कब हुआ?",
+        "q_en": "When did bank nationalization occur in India?",
+        "options": ["1969 और 1980", "1947 और 1950", "1991", "2000"],
+        "options_en": ["1969 and 1980", "1947 and 1950", "1991", "2000"],
+        "answer": 0,
+        "explanation": "भारत में पहली बार 1969 में 14 बैंकों और दूसरी बार 1980 में 6 बैंकों का राष्ट्रीयकरण हुआ। Trick: 1969 = 14 Banks, 1980 = 6 Banks।",
+        "explanation_en": "Bank nationalization in India occurred in 1969 (14 banks) and 1980 (6 banks). Trick: 1969 = 14 Banks, 1980 = 6 Banks."
+    },
+    {
+        "q": "भारत का केंद्रीय बैंक कौन है?",
+        "q_en": "Which is the central bank of India?",
+        "options": ["SBI", "PNB", "RBI", "ICICI"],
+        "options_en": ["SBI", "PNB", "RBI", "ICICI"],
+        "answer": 2,
+        "explanation": "रिज़र्व बैंक ऑफ इंडिया (RBI) भारत का केंद्रीय बैंक है, जो मौद्रिक नीति और मुद्रा प्रबंधन का कार्य करता है।",
+        "explanation_en": "The Reserve Bank of India (RBI) is the central bank of India, responsible for monetary policy and currency management."
+    },
+    {
+        "q": "RBI का मुख्यालय कहाँ है?",
+        "q_en": "Where is the headquarters of RBI?",
+        "options": ["दिल्ली", "मुंबई", "कोलकाता", "चेन्नई"],
+        "options_en": ["Delhi", "Mumbai", "Kolkata", "Chennai"],
+        "answer": 1,
+        "explanation": "RBI का मुख्यालय 1937 में कोलकाता से मुंबई स्थानांतरित हुआ।",
+        "explanation_en": "RBI’s headquarters was shifted from Kolkata to Mumbai in 1937."
+    },
+    {
+        "q": "भारत की मुद्रा पर हस्ताक्षर किसके होते हैं?",
+        "q_en": "Whose signature appears on Indian currency notes?",
+        "options": ["प्रधानमंत्री", "राष्ट्रपति", "RBI गवर्नर", "वित्त मंत्री"],
+        "options_en": ["Prime Minister", "President", "RBI Governor", "Finance Minister"],
+        "answer": 2,
+        "explanation": "भारत की मुद्रा नोटों पर RBI गवर्नर के हस्ताक्षर होते हैं।",
+        "explanation_en": "Indian currency notes bear the signature of the RBI Governor."
+    },
+    {
+        "q": "1 रुपया के नोट पर किसके हस्ताक्षर होते हैं?",
+        "q_en": "Whose signature appears on the 1 Rupee note?",
+        "options": ["RBI गवर्नर", "राष्ट्रपति", "वित्त सचिव", "प्रधानमंत्री"],
+        "options_en": ["RBI Governor", "President", "Finance Secretary", "Prime Minister"],
+        "answer": 2,
+        "explanation": "1 रुपये का नोट वित्त मंत्रालय द्वारा जारी किया जाता है, इसलिए इस पर वित्त सचिव के हस्ताक्षर होते हैं।",
+        "explanation_en": "The 1 Rupee note is issued by the Ministry of Finance, so it bears the Finance Secretary’s signature."
+    },
+    {
+        "q": "भारत में मुद्रा जारी करने का अधिकार किसके पास है?",
+        "q_en": "Who has the authority to issue currency in India?",
+        "options": ["RBI", "SBI", "वित्त मंत्रालय", "संसद"],
+        "options_en": ["RBI", "SBI", "Ministry of Finance", "Parliament"],
+        "answer": 0,
+        "explanation": "RBI को मुद्रा जारी करने का अधिकार है, सिवाय 1 रुपये के नोट के, जो वित्त मंत्रालय द्वारा जारी होता है।",
+        "explanation_en": "RBI has the authority to issue currency, except for the 1 Rupee note, which is issued by the Ministry of Finance."
+    },
+
+ {
+        "q": "भारत का सबसे बड़ा रोजगार देने वाला क्षेत्र कौन है?",
+        "q_en": "Which is the largest employment-generating sector in India?",
+        "options": ["कृषि", "उद्योग", "सेवा क्षेत्र", "IT Sector"],
+        "options_en": ["Agriculture", "Industry", "Service Sector", "IT Sector"],
+        "answer": 0,
+        "explanation": "कृषि भारत में सबसे अधिक रोजगार प्रदान करती है, क्योंकि अधिकांश आबादी अभी भी इस पर निर्भर है।",
+        "explanation_en": "Agriculture provides the most employment in India, as a large portion of the population depends on it."
+    },
+    {
+        "q": "भारत में सर्वाधिक GDP योगदान किस सेक्टर का है?",
+        "q_en": "Which sector contributes the most to India’s GDP?",
+        "options": ["कृषि", "सेवा (Service)", "उद्योग", "खनन"],
+        "options_en": ["Agriculture", "Service", "Industry", "Mining"],
+        "answer": 1,
+        "explanation": "सेवा क्षेत्र (जैसे IT, बैंकिंग, संचार, परिवहन) भारत के GDP में सबसे बड़ा योगदान देता है।",
+        "explanation_en": "The service sector (e.g., IT, banking, communication, transport) contributes the largest share to India’s GDP."
+    },
+    {
+        "q": "भारत में गरीबी रेखा तय करने के लिए Planning Commission ने किस समिति का गठन किया?",
+        "q_en": "Which committee was formed by the Planning Commission to determine the poverty line in India?",
+        "options": ["लक्षद्वीप समिति", "तेंदुलकर समिति", "रंगराजन समिति", "गाडगिल समिति"],
+        "options_en": ["Lakshadweep Committee", "Tendulkar Committee", "Rangarajan Committee", "Gadgil Committee"],
+        "answer": 1,
+        "explanation": "तेंदुलकर समिति (2009) ने भारत में गरीबी रेखा को परिभाषित करने के लिए नए मानदंड दिए।",
+        "explanation_en": "The Tendulkar Committee (2009) provided new criteria for defining the poverty line in India."
+    },
+    {
+        "q": "भारत में ‘गरीबी उन्मूलन’ का नारा किसने दिया था?",
+        "q_en": "Who gave the slogan ‘Garibi Hatao’ (Eradicate Poverty) in India?",
+        "options": ["राजीव गांधी", "इंदिरा गांधी", "नेहरू", "लाल बहादुर शास्त्री"],
+        "options_en": ["Rajiv Gandhi", "Indira Gandhi", "Nehru", "Lal Bahadur Shastri"],
+        "answer": 1,
+        "explanation": "इंदिरा गांधी ने 1971 के चुनाव में ‘गरीबी हटाओ’ का नारा दिया था। Trick: Garibi Hatao – Indira Ji।",
+        "explanation_en": "Indira Gandhi gave the slogan ‘Garibi Hatao’ during the 1971 elections. Trick: Garibi Hatao – Indira Ji."
+    },
+    {
+        "q": "MNREGA (मनरेगा) किस वर्ष लागू हुई?",
+        "q_en": "When was MNREGA implemented?",
+        "options": ["2005", "2004", "2006", "2008"],
+        "options_en": ["2005", "2004", "2006", "2008"],
+        "answer": 0,
+        "explanation": "महात्मा गांधी राष्ट्रीय ग्रामीण रोजगार गारंटी अधिनियम (MNREGA) 2005 में लागू हुआ, जो ग्रामीण क्षेत्रों में रोजगार की गारंटी देता है।",
+        "explanation_en": "The Mahatma Gandhi National Rural Employment Guarantee Act (MNREGA) was implemented in 2005, ensuring employment in rural areas."
+    },
+    {
+        "q": "भारत का पहला आर्थिक जनगणना कब हुआ?",
+        "q_en": "When was India’s first Economic Census conducted?",
+        "options": ["1977", "1980", "1991", "2001"],
+        "options_en": ["1977", "1980", "1991", "2001"],
+        "answer": 0,
+        "explanation": "भारत की पहली आर्थिक जनगणना 1977 में आयोजित की गई थी, जो आर्थिक गतिविधियों और रोजगार के आँकड़े एकत्र करने के लिए थी। Trick: Economic Census = 1977 में पहला कदम।",
+        "explanation_en": "India’s first Economic Census was conducted in 1977 to collect data on economic activities and employment. Trick: Economic Census = First Step in 1977."
+    }
 ];
 
         let selectedAnswers = new Array(questions.length).fill(null);
@@ -605,6 +1548,12 @@
         let timerInterval;
         let answerTimes = [];
         let startTime;
+        let autoScrollInterval = null;
+        let currentQuestionIndex = 0;
+        let openCount = localStorage.getItem('openCount') ? parseInt(localStorage.getItem('openCount')) : 0;
+        openCount++;
+        localStorage.setItem('openCount', openCount);
+        let pastScores = localStorage.getItem('pastScores') ? JSON.parse(localStorage.getItem('pastScores')) : [];
 
         function formatTime(seconds) {
             const m = Math.floor(seconds / 60).toString().padStart(2, '0');
@@ -657,7 +1606,7 @@
                     cls = 'answered';
                 }
                 return `
-                    <div class='card ${cls}'>
+                    <div class='card ${cls}' id="question-${index}">
                         <div class='question'>
                             Q${index + 1}. ${lang === 'en' ? q.q_en : q.q}
                             ${lang === 'both' ? `<div class='en'>Q${index + 1}. ${q.q_en}</div>` : ''}
@@ -681,6 +1630,10 @@
                             <div class='explanation ${selectedAnswers[index] !== null ? 'active' : ''}'>
                                 <b>Explanation:</b> ${lang === 'en' ? q.explanation_en : q.explanation}
                                 ${lang === 'both' ? `<div class='en'><b>Explanation:</b> ${q.explanation_en}</div>` : ''}
+                            </div>
+                            <div class='trick'>
+                                <span class='trick-title'>Trick:</span> <span class='trick-content'>${lang === 'en' ? q.trick_en : q.trick}</span>
+                                ${lang === 'both' ? `<div class='en'><span class='trick-title'>Trick:</span> <span class='trick-content'>${q.trick_en}</span></div>` : ''}
                             </div>` : ''}
                     </div>`;
             }).join('');
@@ -717,6 +1670,10 @@
             document.getElementById('score').innerText = `Your Score: ${score} / ${questions.length} (Total Time: ${formatTime(totalSeconds)})`;
             loadQuestions();
             clearInterval(timerInterval);
+            stopAutoScroll(); // Stop auto scroll on submit
+            document.getElementById('quizPage').classList.add('end-bg'); // Set black background on end
+            pastScores.push({date: new Date().toLocaleString(), score, total: questions.length});
+            localStorage.setItem('pastScores', JSON.stringify(pastScores));
             setTimeout(goToDashboard, 2000);
         }
 
@@ -782,6 +1739,7 @@
             document.getElementById('startPage').style.display = 'none';
             document.getElementById('quizPage').style.display = 'block';
             document.getElementById('dashboardPage').style.display = 'none';
+            document.getElementById('quizPage').classList.remove('end-bg'); // Reset background
             startTimer();
             loadQuestions();
             startTime = Date.now(); // Initialize start time for the first question
@@ -792,6 +1750,52 @@
             document.getElementById('quizPage').style.display = 'none';
             document.getElementById('dashboardPage').style.display = 'block';
             loadDashboard();
+        }
+
+        // New Auto Scroll Functions
+        function startAutoScroll() {
+            stopAutoScroll(); // Clear any existing interval
+            const speedSelect = document.getElementById('autoScrollSpeed').value;
+            if (speedSelect === 'none') return;
+
+            let scrollDelay;
+            switch (speedSelect) {
+                case 'very-slow':
+                    scrollDelay = 10000; // 10 seconds
+                    break;
+                case 'slow':
+                    scrollDelay = 7000; // 7 seconds
+                    break;
+                case 'normal':
+                    scrollDelay = 5000; // 5 seconds
+                    break;
+                case 'fast':
+                    scrollDelay = 3000; // 3 seconds
+                    break;
+                default:
+                    scrollDelay = 5000;
+            }
+
+            autoScrollInterval = setInterval(() => {
+                if (submitted || currentQuestionIndex >= questions.length) {
+                    stopAutoScroll();
+                    return;
+                }
+
+                const questionElement = document.getElementById(`question-${currentQuestionIndex}`);
+                if (questionElement) {
+                    questionElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
+                currentQuestionIndex++;
+            }, scrollDelay);
+        }
+
+        function stopAutoScroll() {
+            if (autoScrollInterval) {
+                clearInterval(autoScrollInterval);
+                autoScrollInterval = null;
+            }
+            currentQuestionIndex = 0; // Reset index
         }
 
       function loadDashboard() {
@@ -843,8 +1847,17 @@
     }
     questionTimesHTML += '</ul>';
 
+    // Records HTML
+    let recordsHTML = '<h4>Record</h4><ul>';
+    recordsHTML += `<li>Total Opens: ${openCount}</li>`;
+    pastScores.forEach(rec => {
+        recordsHTML += `<li>${rec.date}: Score ${rec.score}/${rec.total}</li>`;
+    });
+    recordsHTML += '</ul>';
+
     const dashboardGrid = document.getElementById('dashboardGrid');
     dashboardGrid.innerHTML = `
+        <div class="dash-box">${recordsHTML}</div>
         <div class="dash-box"><h4>Total Questions</h4><p>${totalQuestions}</p></div>
         <div class="dash-box"><h4>Attempted</h4><p>${attempted}</p></div>
         <div class="dash-box"><h4>Unattempted</h4><p>${unattempted}</p></div>
@@ -906,6 +1919,21 @@ function exportDashboard() {
         pdf.save('dashboard.pdf');
     });
 }
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', function(e) {
+            if (e.ctrlKey && e.key === 's') {
+                e.preventDefault();
+                stopAutoScroll();
+            } else if (e.shiftKey && e.key === 'S') {
+                startAutoScroll();
+            } else if (e.ctrlKey && e.key === 'ArrowDown') {
+                window.scrollTo({top: document.body.scrollHeight, behavior: 'smooth'});
+            } else if (e.ctrlKey && e.key === 'ArrowUp') {
+                window.scrollTo({top: 0, behavior: 'smooth'});
+            }
+        });
+
         // Initialize
         document.getElementById('timerContainer').addEventListener('dblclick', function() {
             this.classList.toggle('hidden');
