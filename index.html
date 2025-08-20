@@ -31,37 +31,37 @@
             gap: 20px;
         }
 
-      .box {
-    background: linear-gradient(45deg, rgb(218, 0, 171), rgb(0, 255, 191), rgb(255, 221, 0), rgb(218, 0, 171));
-    background-size: 400% 400%;
-    padding: 8px 50px;
-    font-size: 2.1rem;
-    font-weight: 700;
-    font-family: 'Tangerine', cursive;
-    color: black;
-    box-shadow: 0 0 50px rgb(0, 255, 191);
-    outline: 4px solid black;
-    outline-offset: 5px;
-    cursor: pointer;
-    border-radius: 10px;
-    text-align: center;
-    white-space: nowrap;
-    overflow: hidden;
-    animation: gradientFlow 5s ease infinite, pulse 1s infinite;
-    transition: background 0.5s ease, box-shadow 0.3s ease;
-}
+        .box {
+            background: linear-gradient(45deg, rgb(218, 0, 171), rgb(0, 255, 191), rgb(255, 221, 0), rgb(218, 0, 171));
+            background-size: 400% 400%;
+            padding: 8px 50px;
+            font-size: 2.1rem;
+            font-weight: 700;
+            font-family: 'Tangerine', cursive;
+            color: black;
+            box-shadow: 0 0 50px rgb(0, 255, 191);
+            outline: 4px solid black;
+            outline-offset: 5px;
+            cursor: pointer;
+            border-radius: 10px;
+            text-align: center;
+            white-space: nowrap;
+            overflow: hidden;
+            animation: gradientFlow 5s ease infinite, pulse 1s infinite;
+            transition: background 0.5s ease, box-shadow 0.3s ease;
+        }
 
-@keyframes gradientFlow {
-    0% { background-position: 0% 50%; }
-    50% { background-position: 100% 50%; }
-    100% { background-position: 0% 50%; }
-}
+        @keyframes gradientFlow {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
 
-.box:hover {
-    background: linear-gradient(45deg, rgb(0, 255, 255), rgb(255, 0, 255), rgb(255, 255, 0), rgb(0, 255, 255));
-    background-size: 400% 400%;
-    box-shadow: 0 0 50px rgb(255, 0, 255);
-}
+        .box:hover {
+            background: linear-gradient(45deg, rgb(0, 255, 255), rgb(255, 0, 255), rgb(255, 255, 0), rgb(0, 255, 255));
+            background-size: 400% 400%;
+            box-shadow: 0 0 50px rgb(255, 0, 255);
+        }
 
         .box:hover {
             background-color: rgb(56, 255, 242);
@@ -108,7 +108,7 @@
         }
 
         #quizPage.end-bg {
-            background: #000; /* Black background at the end */
+            background: #000;
         }
 
         .container {
@@ -117,15 +117,14 @@
             padding: 20px;
         }
 
-       .card {
-    background: linear-gradient(135deg, #258cdf, #a2d9ce, #03b0c7);
-    border-radius: 12px;
-    box-shadow: 0 4px 12px rgba(100, 46, 46, 0.2);
-    padding: 20px;
-    margin-bottom: 30px;
-    transition: transform 0.2s;
-}
-
+        .card {
+            background: linear-gradient(135deg, #258cdf, #a2d9ce, #03b0c7);
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(100, 46, 46, 0.2);
+            padding: 20px;
+            margin-bottom: 30px;
+            transition: transform 0.2s;
+        }
 
         .card:hover {
             transform: translateY(-2px);
@@ -273,6 +272,21 @@
 
         .trick {
             margin-top: 10px;
+        }
+
+        /* New styles for trick text */
+        .trick span.trick-label {
+            font-weight: bold;
+            color: red;
+        }
+
+        .trick span.trick-text {
+            filter: blur(2px);
+            transition: filter 0.3s ease;
+        }
+
+        .trick span.trick-text:hover {
+            filter: none;
         }
 
         .progress {
@@ -623,8 +637,8 @@
     <script>
         const questions = [
     // Very Hard Questions (1-15)
-    
-     {
+      {
+        
         "q": "संविधान किसे कहते हैं?",
         "q_en": "What is a Constitution?",
         "options": ["समाज की संस्कृति", "देश का सर्वोच्च कानून", "सरकार का कार्यक्रम", "धार्मिक नियम"],
@@ -1538,6 +1552,7 @@
         "explanation": "भारत की पहली आर्थिक जनगणना 1977 में आयोजित की गई थी, जो आर्थिक गतिविधियों और रोजगार के आँकड़े एकत्र करने के लिए थी। Trick: Economic Census = 1977 में पहला कदम।",
         "explanation_en": "India’s first Economic Census was conducted in 1977 to collect data on economic activities and employment. Trick: Economic Census = First Step in 1977."
     }
+
 ];
 
         let selectedAnswers = new Array(questions.length).fill(null);
@@ -1630,10 +1645,6 @@
                             <div class='explanation ${selectedAnswers[index] !== null ? 'active' : ''}'>
                                 <b>Explanation:</b> ${lang === 'en' ? q.explanation_en : q.explanation}
                                 ${lang === 'both' ? `<div class='en'><b>Explanation:</b> ${q.explanation_en}</div>` : ''}
-                            </div>
-                            <div class='trick'>
-                                <span class='trick-title'>Trick:</span> <span class='trick-content'>${lang === 'en' ? q.trick_en : q.trick}</span>
-                                ${lang === 'both' ? `<div class='en'><span class='trick-title'>Trick:</span> <span class='trick-content'>${q.trick_en}</span></div>` : ''}
                             </div>` : ''}
                     </div>`;
             }).join('');
@@ -1798,127 +1809,126 @@
             currentQuestionIndex = 0; // Reset index
         }
 
-      function loadDashboard() {
-    const totalQuestions = questions.length;
-    const attempted = selectedAnswers.filter(a => a !== null && a !== -1).length;
-    const unattempted = totalQuestions - attempted;
-    const correct = score;
-    const wrong = attempted - correct;
-    const scorePercentage = (correct / totalQuestions * 100).toFixed(1) || 0;
-    const totalMarks = `${totalQuestions * 20} / ${correct * 20}`; // Assuming 20 marks per question
-    const totalTime = formatTime(totalSeconds);
-    const avgTimePerQuestion = (totalSeconds / attempted).toFixed(1) || 0;
-    const speed = (attempted / (totalSeconds / 60)).toFixed(1) || 0;
-    const accuracy = (correct / attempted * 100).toFixed(1) || 0;
-    const efficiency = accuracy > 80 ? 'High' : accuracy > 60 ? 'Medium' : 'Low';
-    const percentile = accuracy > 90 ? 'Top 15%' : accuracy > 70 ? 'Top 30%' : 'Top 50%';
-    const rank = Math.floor(Math.random() * 280) + 1; // Placeholder
-    let longestStreak = 0;
-    let currentStreak = 0;
-    selectedAnswers.forEach((answer, i) => {
-        if (answer === questions[i].answer) {
-            currentStreak++;
-            longestStreak = Math.max(longestStreak, currentStreak);
-        } else {
-            currentStreak = 0;
+        function loadDashboard() {
+            const totalQuestions = questions.length;
+            const attempted = selectedAnswers.filter(a => a !== null && a !== -1).length;
+            const unattempted = totalQuestions - attempted;
+            const correct = score;
+            const wrong = attempted - correct;
+            const scorePercentage = (correct / totalQuestions * 100).toFixed(1) || 0;
+            const totalMarks = `${totalQuestions * 20} / ${correct * 20}`; // Assuming 20 marks per question
+            const totalTime = formatTime(totalSeconds);
+            const avgTimePerQuestion = (totalSeconds / attempted).toFixed(1) || 0;
+            const speed = (attempted / (totalSeconds / 60)).toFixed(1) || 0;
+            const accuracy = (correct / attempted * 100).toFixed(1) || 0;
+            const efficiency = accuracy > 80 ? 'High' : accuracy > 60 ? 'Medium' : 'Low';
+            const percentile = accuracy > 90 ? 'Top 15%' : accuracy > 70 ? 'Top 30%' : 'Top 50%';
+            const rank = Math.floor(Math.random() * 280) + 1; // Placeholder
+            let longestStreak = 0;
+            let currentStreak = 0;
+            selectedAnswers.forEach((answer, i) => {
+                if (answer === questions[i].answer) {
+                    currentStreak++;
+                    longestStreak = Math.max(longestStreak, currentStreak);
+                } else {
+                    currentStreak = 0;
+                }
+            });
+            const bestSection = 'History (100%)'; // Static as per quiz context
+            const weakSection = 'N/A'; // Placeholder
+            const improvement = accuracy > 80 ? '+5%' : '+2%'; // Placeholder
+            const performanceLevel = accuracy > 80 ? 'Advanced' : accuracy > 60 ? 'Intermediate' : 'Beginner';
+            const medals = accuracy > 80 ? 'Accuracy Master' : 'N/A'; // Placeholder
+            const efficiencyScore = (accuracy * 0.9).toFixed(0); // Placeholder
+            const predictedScore = (scorePercentage * 1.02).toFixed(1); // Placeholder
+            const fastestAnswer = answerTimes.filter(t => t).length ? Math.min(...answerTimes.filter(t => t).map(t => t.time)).toFixed(0) : 'N/A';
+            const slowestAnswer = answerTimes.filter(t => t).length ? Math.max(...answerTimes.filter(t => t).map(t => t.time)).toFixed(0) : 'N/A';
+            const avgTimeCorrect = answerTimes.filter(t => t && t.correct).length ? (answerTimes.filter(t => t && t.correct).reduce((sum, t) => sum + t.time, 0) / answerTimes.filter(t => t && t.correct).length).toFixed(1) : 'N/A';
+            const avgTimeWrong = answerTimes.filter(t => t && !t.correct).length ? (answerTimes.filter(t => t && !t.correct).reduce((sum, t) => sum + t.time, 0) / answerTimes.filter(t => t && !t.correct).length).toFixed(1) : 'N/A';
+            const timeEfficiency = (1 - totalSeconds / (totalQuestions * 30)).toFixed(2); // Placeholder
+            const guessRate = wrong > 0 ? ((wrong / attempted) * 100).toFixed(1) : 0;
+            const firstHalfAccuracy = selectedAnswers.slice(0, Math.ceil(totalQuestions / 2)).filter((a, i) => a === questions[i].answer).length / Math.ceil(totalQuestions / 2) * 100 || 0;
+
+            // Generate HTML for time per question (hidden initially)
+            let questionTimesHTML = '<ul>';
+            for (let i = 0; i < totalQuestions; i++) {
+                const at = answerTimes[i];
+                const time = at ? at.time.toFixed(1) : 'N/A';
+                questionTimesHTML += `<li>Q${i+1}: ${time} sec</li>`;
+            }
+            questionTimesHTML += '</ul>';
+
+            // Records HTML
+            let recordsHTML = '<h4>Record</h4><ul>';
+            recordsHTML += `<li>Total Opens: ${openCount}</li>`;
+            pastScores.forEach(rec => {
+                recordsHTML += `<li>${rec.date}: Score ${rec.score}/${rec.total}</li>`;
+            });
+            recordsHTML += '</ul>';
+
+            const dashboardGrid = document.getElementById('dashboardGrid');
+            dashboardGrid.innerHTML = `
+                <div class="dash-box">${recordsHTML}</div>
+                <div class="dash-box"><h4>Total Questions</h4><p>${totalQuestions}</p></div>
+                <div class="dash-box"><h4>Attempted</h4><p>${attempted}</p></div>
+                <div class="dash-box"><h4>Unattempted</h4><p>${unattempted}</p></div>
+                <div class="dash-box"><h4>Correct</h4><p>${correct}</p></div>
+                <div class="dash-box"><h4>Wrong</h4><p>${wrong}</p></div>
+                <div class="dash-box"><h4>Score</h4><p>${scorePercentage}%</p></div>
+                <div class="dash-box"><h4>Total Marks</h4><p>${totalMarks}</p></div>
+                <div class="dash-box"><h4>Total Time</h4><p>${totalTime}</p></div>
+                <div class="dash-box"><h4>Avg Time/Q</h4><p>${avgTimePerQuestion} sec</p></div>
+                <div class="dash-box"><h4>Speed</h4><p>${speed} Q/min</p></div>
+                <div class="dash-box"><h4>Accuracy</h4><p>${accuracy}%</p></div>
+                <div class="dash-box"><h4>Efficiency</h4><p>${efficiency}</p></div>
+                <div class="dash-box"><h4>Percentile</h4><p>${percentile}</p></div>
+                <div class="dash-box"><h4>Longest Streak</h4><p>${longestStreak} Qs</p></div>
+                <div class="dash-box"><h4>Weak Section</h4><p>${weakSection}</p></div>
+                <div class="dash-box"><h4>Improvement</h4><p>${improvement}</p></div>
+                <div class="dash-box"><h4>Performance Level</h4><p>${performanceLevel}</p></div>
+                <div class="dash-box"><h4>Medals</h4><p>${medals}</p></div>
+                <div class="dash-box"><h4>Efficiency Score</h4><p>${efficiencyScore}</p></div>
+                <div class="dash-box"><h4>Predicted Score</h4><p>${predictedScore}%</p></div>
+                <div class="dash-box"><h4>Questions/Min</h4><p>${speed} Q/min</p></div>
+                <div class="dash-box"><h4>Fastest Answer</h4><p>${fastestAnswer} sec</p></div>
+                <div class="dash-box"><h4>Slowest Answer</h4><p>${slowestAnswer} sec</p></div>
+                <div class="dash-box"><h4>Avg Time Correct</h4><p>${avgTimeCorrect} sec</p></div>
+                <div class="dash-box"><h4>Avg Time Wrong</h4><p>${avgTimeWrong} sec</p></div>
+                <div class="dash-box"><h4>Time Efficiency</h4><p>${timeEfficiency}</p></div>
+                <div class="dash-box"><h4>Guess Rate</h4><p>${guessRate}%</p></div>
+                <div class="dash-box"><h4>First-Half Accuracy</h4><p>${firstHalfAccuracy.toFixed(1)}%</p></div>
+                <div class="dash-box"><h4>Total Time on Submit</h4><p>${totalTime}</p></div>
+                <div class="dash-box"><h4>Show Time Details</h4><button onclick="toggleTimeDetails()">Show Times</button><div id="timeDetails" style="display:none;">${questionTimesHTML}</div></div>
+            `;
         }
-    });
-    const bestSection = 'History (100%)'; // Static as per quiz context
-    const weakSection = 'N/A'; // Placeholder
-    const improvement = accuracy > 80 ? '+5%' : '+2%'; // Placeholder
-    const performanceLevel = accuracy > 80 ? 'Advanced' : accuracy > 60 ? 'Intermediate' : 'Beginner';
-    const medals = accuracy > 80 ? 'Accuracy Master' : 'N/A'; // Placeholder
-    const efficiencyScore = (accuracy * 0.9).toFixed(0); // Placeholder
-    const predictedScore = (scorePercentage * 1.02).toFixed(1); // Placeholder
-    const fastestAnswer = answerTimes.filter(t => t).length ? Math.min(...answerTimes.filter(t => t).map(t => t.time)).toFixed(0) : 'N/A';
-    const slowestAnswer = answerTimes.filter(t => t).length ? Math.max(...answerTimes.filter(t => t).map(t => t.time)).toFixed(0) : 'N/A';
-    const avgTimeCorrect = answerTimes.filter(t => t && t.correct).length ? (answerTimes.filter(t => t && t.correct).reduce((sum, t) => sum + t.time, 0) / answerTimes.filter(t => t && t.correct).length).toFixed(1) : 'N/A';
-    const avgTimeWrong = answerTimes.filter(t => t && !t.correct).length ? (answerTimes.filter(t => t && !t.correct).reduce((sum, t) => sum + t.time, 0) / answerTimes.filter(t => t && !t.correct).length).toFixed(1) : 'N/A';
-    const timeEfficiency = (1 - totalSeconds / (totalQuestions * 30)).toFixed(2); // Placeholder
-    const guessRate = wrong > 0 ? ((wrong / attempted) * 100).toFixed(1) : 0;
-    const firstHalfAccuracy = selectedAnswers.slice(0, Math.ceil(totalQuestions / 2)).filter((a, i) => a === questions[i].answer).length / Math.ceil(totalQuestions / 2) * 100 || 0;
 
-    // Generate HTML for time per question (hidden initially)
-    let questionTimesHTML = '<ul>';
-    for (let i = 0; i < totalQuestions; i++) {
-        const at = answerTimes[i];
-        const time = at ? at.time.toFixed(1) : 'N/A';
-        questionTimesHTML += `<li>Q${i+1}: ${time} sec</li>`;
-    }
-    questionTimesHTML += '</ul>';
+        // Function to toggle time details display
+        function toggleTimeDetails() {
+            const timeDetails = document.getElementById('timeDetails');
+            timeDetails.style.display = timeDetails.style.display === 'none' ? 'block' : 'none';
+        }
 
-    // Records HTML
-    let recordsHTML = '<h4>Record</h4><ul>';
-    recordsHTML += `<li>Total Opens: ${openCount}</li>`;
-    pastScores.forEach(rec => {
-        recordsHTML += `<li>${rec.date}: Score ${rec.score}/${rec.total}</li>`;
-    });
-    recordsHTML += '</ul>';
-
-    const dashboardGrid = document.getElementById('dashboardGrid');
-    dashboardGrid.innerHTML = `
-        <div class="dash-box">${recordsHTML}</div>
-        <div class="dash-box"><h4>Total Questions</h4><p>${totalQuestions}</p></div>
-        <div class="dash-box"><h4>Attempted</h4><p>${attempted}</p></div>
-        <div class="dash-box"><h4>Unattempted</h4><p>${unattempted}</p></div>
-        <div class="dash-box"><h4>Correct</h4><p>${correct}</p></div>
-        <div class="dash-box"><h4>Wrong</h4><p>${wrong}</p></div>
-        <div class="dash-box"><h4>Score</h4><p>${scorePercentage}%</p></div>
-        <div class="dash-box"><h4>Total Marks</h4><p>${totalMarks}</p></div>
-        <div class="dash-box"><h4>Total Time</h4><p>${totalTime}</p></div>
-        <div class="dash-box"><h4>Avg Time/Q</h4><p>${avgTimePerQuestion} sec</p></div>
-        <div class="dash-box"><h4>Speed</h4><p>${speed} Q/min</p></div>
-        <div class="dash-box"><h4>Accuracy</h4><p>${accuracy}%</p></div>
-        <div class="dash-box"><h4>Efficiency</h4><p>${efficiency}</p></div>
-        <div class="dash-box"><h4>Percentile</h4><p>${percentile}</p></div>
-        <div class="dash-box"><h4>Longest Streak</h4><p>${longestStreak} Qs</p></div>
-        <div class="dash-box"><h4>Weak Section</h4><p>${weakSection}</p></div>
-        <div class="dash-box"><h4>Improvement</h4><p>${improvement}</p></div>
-        <div class="dash-box"><h4>Performance Level</h4><p>${performanceLevel}</p></div>
-        <div class="dash-box"><h4>Medals</h4><p>${medals}</p></div>
-        <div class="dash-box"><h4>Efficiency Score</h4><p>${efficiencyScore}</p></div>
-        <div class="dash-box"><h4>Predicted Score</h4><p>${predictedScore}%</p></div>
-        <div class="dash-box"><h4>Questions/Min</h4><p>${speed} Q/min</p></div>
-        <div class="dash-box"><h4>Fastest Answer</h4><p>${fastestAnswer} sec</p></div>
-        <div class="dash-box"><h4>Slowest Answer</h4><p>${slowestAnswer} sec</p></div>
-        <div class="dash-box"><h4>Avg Time Correct</h4><p>${avgTimeCorrect} sec</p></div>
-        <div class="dash-box"><h4>Avg Time Wrong</h4><p>${avgTimeWrong} sec</p></div>
-        <div class="dash-box"><h4>Time Efficiency</h4><p>${timeEfficiency}</p></div>
-        <div class="dash-box"><h4>Guess Rate</h4><p>${guessRate}%</p></div>
-        <div class="dash-box"><h4>First-Half Accuracy</h4><p>${firstHalfAccuracy.toFixed(1)}%</p></div>
-        <div class="dash-box"><h4>Total Time on Submit</h4><p>${totalTime}</p></div>
-        <div class="dash-box"><h4>Show Time Details</h4><button onclick="toggleTimeDetails()">Show Times</button><div id="timeDetails" style="display:none;">${questionTimesHTML}</div></div>
-        
-        `;
-}
-
-// Function to toggle time details display
-function toggleTimeDetails() {
-    const timeDetails = document.getElementById('timeDetails');
-    timeDetails.style.display = timeDetails.style.display === 'none' ? 'block' : 'none';
-}
-
-// Function to export dashboard as PNG or PDF
-function exportDashboard() {
-    const dashboard = document.getElementById('dashboardGrid');
-    html2canvas(dashboard).then(canvas => {
-        const imgData = canvas.toDataURL('image/png');
-        
-        // Download as PNG
-        const link = document.createElement('a');
-        link.href = imgData;
-        link.download = 'dashboard.png';
-        link.click();
-        
-        // Convert to PDF
-        const pdf = new jsPDF('p', 'mm', 'a4');
-        const imgProps = pdf.getImageProperties(imgData);
-        const pdfWidth = pdf.internal.pageSize.getWidth();
-        const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
-        pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
-        pdf.save('dashboard.pdf');
-    });
-}
+        // Function to export dashboard as PNG or PDF
+        function exportDashboard() {
+            const dashboard = document.getElementById('dashboardGrid');
+            html2canvas(dashboard).then(canvas => {
+                const imgData = canvas.toDataURL('image/png');
+                
+                // Download as PNG
+                const link = document.createElement('a');
+                link.href = imgData;
+                link.download = 'dashboard.png';
+                link.click();
+                
+                // Convert to PDF
+                const pdf = new jsPDF('p', 'mm', 'a4');
+                const imgProps = pdf.getImageProperties(imgData);
+                const pdfWidth = pdf.internal.pageSize.getWidth();
+                const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
+                pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+                pdf.save('dashboard.pdf');
+            });
+        }
 
         // Keyboard shortcuts
         document.addEventListener('keydown', function(e) {
@@ -1946,5 +1956,4 @@ function exportDashboard() {
         document.head.appendChild(link);
     </script>
 </body>
-
 </html>
